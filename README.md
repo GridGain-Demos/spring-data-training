@@ -1,7 +1,13 @@
-# spring-data-training
-Template project for Apache Ignite with Spring Boot and Spring Data Training
+# Project Template for Apache Ignite With Spring Boot and Spring Data Training
 
-TBD
+This project template is used throughout a 
+[two-hour training session for Java developers and architects](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development) 
+who want to explore the best practices and nuances of using Spring Boot and Spring Data with Apache Ignite.
+During that instructor-led training, you build a RESTful web service that uses Apache Ignite as an in-memory database. 
+The service is a Spring Boot application that interacts with the Ignite cluster via Spring Data repository abstractions.
+
+Check [the schedule a join one of our upcoming sessions](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development).
+All the sessions are delivered by seasoned Ignite experts and committers.
 
 ## Setting Up Environment
 
@@ -34,8 +40,6 @@ TBD
     </properties>
     ```
    
-SLIDES_TODO: explain how to use spring boot autoconfigure and what types exist
-
 ## Start Ignite Server Node With Spring Boot
 
 1. Add the `IgniteConfig` class that returns an instance of Ignite started by Spring Boot:
@@ -187,8 +191,6 @@ connect to the server.
         System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
     }
     ```
-SLIDES_TODO: show to return a complete key-value pair and run joins.
-
 ## Create Spring REST Controller
 
 1. Create a REST Controller for the application:
