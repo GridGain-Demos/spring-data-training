@@ -67,10 +67,10 @@ SLIDES_TODO: explain how to use spring boot autoconfigure and what types exist
      }
     ```
 
-2. Add an `ServerNodeStartupClass` class that will be a separate application/process for an Ignite server node.
+2. Add an `ServerNodeStartup` class that will be a separate application/process for an Ignite server node.
 
     ```java
-    public class ServerNodeStartupClass {
+    public class ServerNodeStartup {
         public static void main(String[] args) {
             Ignition.start();
         }
@@ -139,7 +139,7 @@ connect to the server.
 2. Add a method that returns countries with a population bigger than provided one:
 
     ```java
-    public List<Cache.Entry<String, Country>> findByPopulationGreaterThanOrderByPopulationDesc(int population);
+    public List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
     ```
 
 3. Add a test that validates that the method returns a non-empty result:
