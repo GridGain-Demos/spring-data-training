@@ -36,4 +36,11 @@ public class CityKey implements Serializable {
     @Override public int hashCode() {
         return Objects.hash(ID, COUNTRYCODE);
     }
+
+    @Override public String toString() {
+        return "CityKey{" +
+            "ID=" + ID +
+            ", COUNTRYCODE='" + COUNTRYCODE + '\'' +
+            '}';
+    }
 }

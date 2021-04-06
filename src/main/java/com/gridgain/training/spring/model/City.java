@@ -30,4 +30,12 @@ public class City {
     public void setPopulation(int population) {
         this.population = population;
     }
+
+    @Override public String toString() {
+        return "City{" +
+            "name='" + name + '\'' +
+            ", district='" + district + '\'' +
+            ", population=" + population +
+            '}';
+    }
 }

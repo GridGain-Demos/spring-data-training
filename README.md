@@ -141,11 +141,77 @@ connect to the server.
     ```java
     public List<Cache.Entry<String, Country>> findByPopulationGreaterThanOrderByPopulationDesc(int population);
     ```
-   
+
+3. Add a test that validates that the method returns a non-empty result:
+
+    ```java
+    @Test
+    void countryRepositoryWorks() {
+       System.out.println("count=" + countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
+    }
+    ```
 ## Run Direct Queries With JOINs Via Ignite Repository
 
-## Create Spring RESTFul Services
+1. Create the `CityRepository` class:
 
-1. Create GET Requests
+    ```java
+    @RepositoryConfig(cacheName = "City")
+    @Repository
+    public interface CityRepository extends IgniteRepository<City, CityKey> {
+    }
+    ```
 
-2. Create POST Requests
+2. Add a query that returns a complete key-value pair ([this limitation requires to use a direct query](https://issues.apache.org/jira/browse/IGNITE-13028)):
+
+    ```java
+    @Query("SELECT * FROM City WHERE id = ?")
+    public Cache.Entry<CityKey, City> findById(int id);
+    ```
+3. Add a direct SQL query that joins two tables:
+
+    ```java
+    @Query("SELECT city.name, MAX(city.population), country.name FROM country " +
+            "JOIN city ON city.countrycode = country.code " +
+            "GROUP BY city.name, country.name, city.population " +
+            "ORDER BY city.population DESC LIMIT ?")
+    public List<List<?>> findTopXMostPopulatedCities(int limit);
+    ```
+
+4. Create a test to validate the methods respond properly:
+
+    ```java
+    @Test
+    void cityRepositoryWorks() {
+        System.out.println("city = " + cityRepository.findById(34));
+        
+        System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
+    }
+    ```
+SLIDES_TODO: show to return a complete key-value pair and run joins.
+
+## Create Spring REST Controller
+
+1. Create a REST Controller for the application:
+
+    ```java
+    @RestController
+    public class WorldDatabaseController {
+        @Autowired CityRepository cityRepository;
+        
+    }
+    ```
+
+2. Add a method that returns top X most populated cities:
+
+    ```java
+    @GetMapping("/api/mostPopulated")
+    public List<List<?>> getMostPopulatedCities(@RequestParam(value = "limit", required = false) Integer limit) {
+        return cityRepository.findTopXMostPopulatedCities(limit);
+    }
+    ```
+   
+3. Test the method in your browser:
+
+    ```shell script
+    http://localhost:8080/api/mostPopulated?limit=5
+    ```

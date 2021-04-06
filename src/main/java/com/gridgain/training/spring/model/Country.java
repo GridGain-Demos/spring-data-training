@@ -142,4 +142,23 @@ public class Country {
     public void setCode2(String code2) {
         this.code2 = code2;
     }
+
+    @Override public String toString() {
+        return "Country{" +
+            "name='" + name + '\'' +
+            ", continent='" + continent + '\'' +
+            ", region='" + region + '\'' +
+            ", population=" + population +
+            ", surfaceArea=" + surfaceArea +
+            ", indepYear=" + indepYear +
+            ", lifeExpectancy=" + lifeExpectancy +
+            ", gnp=" + gnp +
+            ", gnpOld=" + gnpOld +
+            ", localName='" + localName + '\'' +
+            ", governmentForm='" + governmentForm + '\'' +
+            ", headOfState='" + headOfState + '\'' +
+            ", capital=" + capital +
+            ", code2='" + code2 + '\'' +
+            '}';
+    }
 }
