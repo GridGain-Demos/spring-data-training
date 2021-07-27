@@ -31,6 +31,18 @@ All the sessions are delivered by seasoned Ignite experts and committers.
         <artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
         <version>1.0.0</version>
     </dependency>
+
+    <dependency>
+       <groupId>org.apache.ignite</groupId>
+       <artifactId>ignite-core</artifactId>
+       <version>2.10.0</version>
+    </dependency>
+
+    <dependency>
+       <groupId>org.apache.ignite</groupId>
+       <artifactId>ignite-indexing</artifactId>
+       <version>2.10.0</version>
+    </dependency>
     ```
 
 2. Add the following property to the pom.xml to select a version of H2 supported by Ignite:
