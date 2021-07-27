@@ -22,14 +22,14 @@ All the sessions are delivered by seasoned Ignite experts and committers.
     ```xml
     <dependency>
        <groupId>org.apache.ignite</groupId>
-       <artifactId>ignite-spring-data-2.2-ext</artifactId>
-       <version>1.0.0</version>
+       <artifactId>ignite-spring-data</artifactId>
+       <version>2.9.1</version>
     </dependency>
 
     <dependency>
-        <groupId>org.apache.ignite</groupId>
-        <artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
-        <version>1.0.0</version>
+       <groupId>org.apache.ignite</groupId>
+       <artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
+       <version>1.0.0</version>
     </dependency>
     ```
 
