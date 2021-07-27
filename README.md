@@ -15,6 +15,14 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 * Apache Maven 3.0 or later
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
 
+## Clone the Project
+
+Open a terminal window and clone the project to your dev environment:
+
+```shell script
+git clone https://github.com/GridGain-Demos/spring-data-training.git
+```
+
 ## Configure Ignite Spring Boot and Data Extensions
 
 1. Enable Ignite Spring Boot and Spring Data extensions by adding the following artifacts to the `pom.xml` file
