@@ -30,8 +30,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
     ```xml
     <dependency>
        <groupId>org.apache.ignite</groupId>
-       <artifactId>ignite-spring-data</artifactId>
-       <version>2.9.1</version>
+       <artifactId>ignite-spring-data-2.2-ext</artifactId>
+       <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -135,7 +135,6 @@ connect to the server.
     !run config/world.sql
     ```
 
-
 ## Run Simple Auto-Generated Queries Via Ignite Repository
 
 1. Create the `CountryRepository` class:
@@ -173,10 +172,9 @@ connect to the server.
     }
     ```
 
-2. Add a query that returns a complete key-value pair ([this limitation requires to use a direct query](https://issues.apache.org/jira/browse/IGNITE-13028)):
+2. Add a query that returns a complete key-value pair:
 
     ```java
-    @Query("SELECT * FROM City WHERE id = ?")
     public Cache.Entry<CityKey, City> findById(int id);
     ```
 3. Add a direct SQL query that joins two tables:
