@@ -21,9 +21,9 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 
     ```xml
     <dependency>
-        <groupId>org.apache.ignite</groupId>
-        <artifactId>ignite-spring-data_2.2</artifactId>
-        <version>2.9.1</version>
+       <groupId>org.apache.ignite</groupId>
+       <artifactId>ignite-spring-data-2.2-ext</artifactId>
+       <version>1.0.0</version>
     </dependency>
 
     <dependency>
