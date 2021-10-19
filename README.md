@@ -191,7 +191,7 @@ connect to the server.
     public List<List<?>> findTopXMostPopulatedCities(int limit);
     ```
 
-4. Create a test to validate the methods respond properly:
+4. Create a test in ApplicationTests to validate the methods respond properly:
 
     ```java
     @Test
@@ -200,6 +200,10 @@ connect to the server.
         
         System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
     }
+    ```
+        Add following line after class declaration:
+    ```java
+    @Autowired CountryRepository countryRepository;
     ```
 ## Create Spring REST Controller
 
