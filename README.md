@@ -161,7 +161,7 @@ connect to the server.
        System.out.println("count=" + countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
     }
     ```
-    Add following line after class declaration:
+    Add following line after ApplicationTests class declaration:
     ```java
     @Autowired CountryRepository countryRepository;
     ```
@@ -201,7 +201,7 @@ connect to the server.
         System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
     }
     ```
-    Add following line after class declaration:
+    Add following line after ApplicationTests class declaration:
     ```java
     @Autowired CityRepository cityRepository;
     ```
