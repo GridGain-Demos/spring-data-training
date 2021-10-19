@@ -201,7 +201,7 @@ connect to the server.
         System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
     }
     ```
-        Add following line after class declaration:
+    Add following line after class declaration:
     ```java
     @Autowired CountryRepository countryRepository;
     ```
