@@ -203,7 +203,7 @@ connect to the server.
     ```
     Add following line after class declaration:
     ```java
-    @Autowired CountryRepository countryRepository;
+    @Autowired CityRepository cityRepository;
     ```
 ## Create Spring REST Controller
 
