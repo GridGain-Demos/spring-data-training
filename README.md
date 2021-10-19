@@ -153,13 +153,17 @@ connect to the server.
     public List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
     ```
 
-3. Add a test that validates that the method returns a non-empty result:
+3. Add a test in ApplicationTests that validates that the method returns a non-empty result:
 
     ```java
     @Test
     void countryRepositoryWorks() {
        System.out.println("count=" + countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
     }
+    ```
+    Add following line after class declaration:
+    ```java
+    @Autowired CountryRepository countryRepository;
     ```
 ## Run Direct Queries With JOINs Via Ignite Repository
 
