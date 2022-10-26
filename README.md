@@ -46,12 +46,6 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
          <artifactId>ignite-spring-data-2.2-ext</artifactId>
          <version>1.0.0</version>
       </dependency>
-
-      <dependency>
-         <groupId>org.apache.ignite</groupId>
-         <artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
-         <version>1.0.0</version>
-      </dependency>
       ```
 
   2. Add the following property to the pom.xml to select a version of H2 supported by Ignite:
