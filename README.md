@@ -87,7 +87,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
        @Bean
        public IgniteConfigurer configurer() {
            return igniteConfiguration -> {
-           igniteConfiguration.setClientMode(true);
+               igniteConfiguration.setClientMode(true);
            };
        }
       ```
@@ -247,7 +247,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 9. Create an Ignite Thin Client Application
 
-  1. Add the `IgniteThnClient` class that performs a join query on the City & Country tables
+  1. Add the `IgniteThinClient` class that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
@@ -273,8 +273,17 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   	}
   }
   ```
+     
+  2. Add the following to the pom.xml:
+  ```xml
+  <dependency>
+      <groupId>org.apache.ignite</groupId>
+      <artifactId>ignite-spring-boot-thin-client-autoconfigure-ext</artifactId>
+      <version>1.0.0</version>
+  </dependency>
+  ```   
 
-  2. Add the `ThinClientApplication` class that boostraps the Thin Client Application.
+  3. Add the `ThinClientApplication` class that boostraps the Thin Client Application.
 
   ```java
   @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class})

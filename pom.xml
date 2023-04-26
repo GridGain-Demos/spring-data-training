@@ -46,11 +46,6 @@
 			<artifactId>spring-data-commons</artifactId>
 			<version>2.2.3.RELEASE</version>
 		</dependency>
-		<dependency>
-			<groupId>org.gridgain</groupId>
-			<artifactId>control-center-agent</artifactId>
-			<version>2.13.0.0</version>
-		</dependency>
 	</dependencies>
 
 	<build>
