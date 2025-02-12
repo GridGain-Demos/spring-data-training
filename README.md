@@ -17,8 +17,10 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
 * Postman REST tool (<https://www.postman.com/>) or a web browser
 
-**<u>Note</u>**  It may be possible to later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>
-*However*, it has only been tested with JDK 8 (1.8)
+**<u>Note</u>**  
+
+Although it is be possible to later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
+we strongly suggest that you only use JDK 8 (1.8).
 
 ## 1. Clone the Project
 
