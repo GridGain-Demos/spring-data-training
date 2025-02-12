@@ -17,6 +17,9 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
 * Postman REST tool (<https://www.postman.com/>) or a web browser
 
+**<u>Note</u>**  It may be possible to later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>
+*However*, it has only been tested with JDK 8 (1.8)
+
 ## 1. Clone the Project
 
 Open a terminal window and clone the project to your dev environment:
@@ -246,8 +249,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       <http://localhost:8080/api/mostPopulated?limit=5>
 
 ## 9. Create an Ignite Thin Client Application
-
-  1. Add the `IgniteThinClient` class that performs a join query on the City & Country tables
+1. Create a new java package named `java/com/gridgain/training/spring`.
+  1. Add the `IgniteThinClient` class to the `java/com/gridgain/training/spring` package that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
