@@ -15,7 +15,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<h2.version>1.4.197</h2.version>
-		<ignite.version>2.13.0</ignite.version>
+		<ignite.version>2.16.0</ignite.version>
 	</properties>
 
 	<repositories>
