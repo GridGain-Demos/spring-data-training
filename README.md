@@ -306,7 +306,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   }
   ```
 
-  3. Stop the `Application` application.  If you do not, you will receive an error about a port conflict.
+  3. Stop the `Application` application (if it is currently running).  If you do not, you will receive an error about a port conflict.
 
   4. Run the `ThinClientApplication` class/application, and confirm the client node can connect to the server & run the query.
 
