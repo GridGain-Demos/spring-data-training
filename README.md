@@ -156,7 +156,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 6. Run Simple Auto-Generated Queries Via Ignite Repository
 
-  1. Create the `CountryRepository` class:
+  1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
 
       ```java
       @RepositoryConfig (cacheName = "Country")
@@ -172,7 +172,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       public List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
       ```
 
-  3. Add a test in ApplicationTests that validates that the method returns a non-empty result:
+  3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
 
       ```java
       @Test
@@ -228,7 +228,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 8. Create Spring REST Controller
 
-  1. Create a REST Controller for the application by create a new class name `WorldDatabaseController` WorldDatabaseController with the following contents.
+  1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
 
       ```java
       @RestController
@@ -247,13 +247,13 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       }
       ```
 
-  3. Test the method in Postman or your browser:
-
+  3.  Restart the `Application` and then test the controller method either in Postman or your browser:
+  
       <http://localhost:8080/api/mostPopulated?limit=5>
 
 ## 9. Create an Ignite Thin Client Application
-1. Create a new java package named `java/com/gridgain/training/thinclient`.
-  1. Add the `IgniteThinClient` class to the `java/com/gridgain/training/thinclient` package that performs a join query on the City & Country tables
+1. Create a new java package named `com.gridgain.training.thinclient`.
+  1. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
@@ -289,7 +289,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   </dependency>
   ```   
 
-  3. Add the `ThinClientApplication` class (in the `java/com/gridgain/training/thinclient` package)that bootstraps the Thin Client Application.
+  3. Add the `ThinClientApplication` class (in the `com.gridgain.training.thinclient` package)that bootstraps the Thin Client Application.
 
   ```java
   @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class})
