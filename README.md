@@ -57,7 +57,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       </dependency>
       ```
 
-  2. Add the following property to the pom.xml to select a version of H2 supported by Ignite:
+  2. The following property **has already been added** to the pom.xml to select a version of H2 supported by Ignite so there is **no need to take any action**.  Just remember that this property needs to set in the pom.xml to insure proper function of Ignite.
+
       ```xml
       <properties>
           <h2.version>1.4.197</h2.version>
@@ -66,7 +67,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 3. Start Ignite Server Node With Spring Boot
 
-  1. Add the `IgniteConfig` class that returns an instance of Ignite started by Spring Boot:
+  1. Add the `IgniteConfig` class in the `com.gridgain.training.spring` package with the following code.  This class returns an instance of Ignite started by Spring Boot:
 
       ```java
       @Configuration
@@ -84,7 +85,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 4. Change Spring Boot Settings to Start Ignite Client Node
 
-  1. Update the `IgniteConfig` by adding an `IgniteConfigurer` that requires Spring Boot to start an Ignite client node:
+  1. Update the `IgniteConfig` by adding an `IgniteConfigurer` that tells Spring Boot to start an Ignite **client** node instead of a server node:
 
       ```java
        @Bean
@@ -95,7 +96,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
        }
       ```
 
-  2. Add an `ServerNodeStartup` class that will be a separate application/process for an Ignite server node.
+  2. Add the `ServerNodeStartup` class (in the `com.gridgain.training.spring` package) that will be used to start a separate application/process for an Ignite server node.
 
       ```java
       public class ServerNodeStartup {
@@ -110,7 +111,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 5. Load World Database
 
-  1. Open the `world.sql` script and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement:
+  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement:
 
       ```sql
       VALUE_TYPE=com.gridgain.training.spring.model.Country
@@ -184,7 +185,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 7. Run Direct Queries With JOINs Via Ignite Repository
 
-  1. Create the `CityRepository` class:
+  1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
 
       ```java
       @RepositoryConfig(cacheName = "City")
@@ -225,7 +226,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 8. Create Spring REST Controller
 
-  1. Create a REST Controller for the application:
+  1. Create a REST Controller for the application by create a new class name `WorldDatabaseController` WorldDatabaseController with the following contents.
 
       ```java
       @RestController
@@ -249,8 +250,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       <http://localhost:8080/api/mostPopulated?limit=5>
 
 ## 9. Create an Ignite Thin Client Application
-1. Create a new java package named `java/com/gridgain/training/spring`.
-  1. Add the `IgniteThinClient` class to the `java/com/gridgain/training/spring` package that performs a join query on the City & Country tables
+1. Create a new java package named `java/com/gridgain/training/thinclient`.
+  1. Add the `IgniteThinClient` class to the `java/com/gridgain/training/thinclient` package that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
@@ -286,7 +287,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   </dependency>
   ```   
 
-  3. Add the `ThinClientApplication` class that boostraps the Thin Client Application.
+  3. Add the `ThinClientApplication` class (in the `java/com/gridgain/training/thinclient` package)that bootstraps the Thin Client Application.
 
   ```java
   @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class})
@@ -305,4 +306,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   }
   ```
 
-  3. Run the `ThinClientApplication` class/application, and confirm the client node can connect to the server & run the query.
+  3. Stop the `Application` application.  If you do not, you will receive an error about a port conflict.
+
+  4. Run the `ThinClientApplication` class/application, and confirm the client node can connect to the server & run the query.
+
