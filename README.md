@@ -83,7 +83,19 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
   2. Update the `Application` class by tagging it with `@EnableIgniteRepositories` annotation.
 
-  3. Start the application and confirm Spring Boot started an Ignite server node instance.
+  3. Start the application and confirm Spring Boot started an Ignite server node instance.  You should see logging output something like that below.  
+     The key part is the line in the center that has a timestamp followed by "Topology Snapshot".  This indicates that the Ignite cluster was started 
+     and has one server and zero clients as a part of it.
+
+ 
+     ```text
+     >>> Local ports: TCP:10800 TCP:11211 TCP:47100 UDP:47400 TCP:47500
+     >>> +-----------------------------------------------------------------------+
+
+     [15:50:20] Topology snapshot [ver=1, locNode=297d311a, servers=1, clients=0, state=ACTIVE, CPUs=12, offheap=7.2GB, heap=8.0GB]
+     [15:50:20]   ^-- Baseline [id=0, size=1, online=1, offline=0]
+     2025-02-12 15:50:20.886  INFO 11298 --- [           main] o.a.i.i.m.d.GridDiscoveryManager         : Topology snapshot [ver=1, locNode=297d311a, servers=1
+     ```
 
 ## 4. Change Spring Boot Settings to Start Ignite Client Node
 
