@@ -120,7 +120,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       }
       ```
 
-  3. Start the Spring Boot application and the `ServerNodeStartupClass` application, and confirm the client node can
+  3. Start the Spring Boot application and the `ServerNodeStartup` application, and confirm the client node can
   connect to the server.
 
 ## 5. Load World Database
@@ -276,7 +276,9 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 9. Create an Ignite Thin Client Application
 1. Create a new java package named `com.gridgain.training.thinclient`.
-  1. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
+
+   
+  2. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
@@ -312,6 +314,12 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   </dependency>
   ```   
 
+ 3.  When maven loads the changes to the POM file, you will likely need to restart the the `ServerNodeStartup` application and reload your data.  You should not need to restart sqlline.  Just reissue the connect and run commands:
+ ```shell
+     !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
+     !run config/world.sql
+ ```
+ 
   3. Add the `ThinClientApplication` class (in the `com.gridgain.training.thinclient` package)that bootstraps the Thin Client Application.
 
   ```java
@@ -337,7 +345,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 
 **<u>Notes</u>**
-1. You can not run both the thin client and the "Application" at the same time since they will both attempt to run on port 8080.  
+1. You can not run both the thin client and the "Application" at the same time since they will both attempt to run on port 8080.
+   
 2. To be able to run the Application once you have added the thin client code, you **will** have to modify the class definition in the Application class.
 Simply remove the "//" from the `@SpringBootApplication` line.  The result should like the line below.
 
