@@ -125,24 +125,35 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 5. Load World Database
 
-  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement:
+  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement.  
+     Be sure to add it inside the "s in the WITH statement and to use a comma to separate the values in the string.
 
       ```sql
       VALUE_TYPE=com.gridgain.training.spring.model.Country
       ```
+     
+      The resulting line should look like this:
 
-  2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement
+      ```sql
+      ) WITH "template=partitioned, backups=1, CACHE_NAME=Country, VALUE_TYPE=com.gridgain.training.spring.model.Country";
+      ```
+
+  2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement.  Again, do this within the "s and use a comma to separate the values.
 
       ```sql
       VALUE_TYPE=com.gridgain.training.spring.model.City
       ```
 
-  3. Add the following `KEY_TYPE` property to the `CREATE TABLE City` statement
+  3. Add the following `KEY_TYPE` property to the `CREATE TABLE City` statement.  Once again, do this within the "s and use a comma to separate the values.
 
       ```sql
       KEY_TYPE=com.gridgain.training.spring.model.CityKey
       ```
 
+     The resulting line should look like this:
+     ```sql
+     ) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City, VALUE_TYPE=com.gridgain.training.spring.model.Country, VALUE_TYPE=com.gridgain.training.spring.model.City";
+     ```
   4. Build a shaded package for the app:
       ```shell script
       mvn clean package -DskipTests=true
