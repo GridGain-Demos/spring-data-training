@@ -135,7 +135,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       The resulting line should look like this:
 
       ```sql
-      ) WITH "template=partitioned, backups=1, CACHE_NAME=Country, VALUE_TYPE=com.gridgain.training.spring.model.Country";
+      ) WITH "template=partitioned, backups=1, CACHE_NAME=Country,VALUE_TYPE=com.gridgain.training.spring.model.Country";
       ```
 
   2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement.  Again, do this within the "s and use a comma to separate the values.
@@ -152,7 +152,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
      The resulting line should look like this:
      ```sql
-     ) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City, VALUE_TYPE=com.gridgain.training.spring.model.Country, VALUE_TYPE=com.gridgain.training.spring.model.City";
+     ) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City,VALUE_TYPE=com.gridgain.training.spring.model.City,KEY_TYPE=com.gridgain.training.spring.model.CityKey";
      ```
   4. Build a shaded package for the app:
       ```shell script
