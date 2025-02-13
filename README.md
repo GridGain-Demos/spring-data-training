@@ -83,7 +83,19 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
   2. Update the `Application` class by tagging it with `@EnableIgniteRepositories` annotation.
 
-  3. Start the application and confirm Spring Boot started an Ignite server node instance.
+  3. Start the application and confirm Spring Boot started an Ignite server node instance.  You should see logging output something like that below.  
+     The key part is the line in the center that has a timestamp followed by "Topology Snapshot".  This indicates that the Ignite cluster was started 
+     and has one server and zero clients as a part of it.
+
+ 
+     ```text
+     >>> Local ports: TCP:10800 TCP:11211 TCP:47100 UDP:47400 TCP:47500
+     >>> +-----------------------------------------------------------------------+
+
+     [15:50:20] Topology snapshot [ver=1, locNode=297d311a, servers=1, clients=0, state=ACTIVE, CPUs=12, offheap=7.2GB, heap=8.0GB]
+     [15:50:20]   ^-- Baseline [id=0, size=1, online=1, offline=0]
+     2025-02-12 15:50:20.886  INFO 11298 --- [           main] o.a.i.i.m.d.GridDiscoveryManager         : Topology snapshot [ver=1, locNode=297d311a, servers=1
+     ```
 
 ## 4. Change Spring Boot Settings to Start Ignite Client Node
 
@@ -108,29 +120,40 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       }
       ```
 
-  3. Start the Spring Boot application and the `ServerNodeStartupClass` application, and confirm the client node can
+  3. Start the Spring Boot application and the `ServerNodeStartup` application, and confirm the client node can
   connect to the server.
 
 ## 5. Load World Database
 
-  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement:
+  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement.  
+     Be sure to add it inside the "s in the WITH statement and to use a comma to separate the values in the string.
 
       ```sql
       VALUE_TYPE=com.gridgain.training.spring.model.Country
       ```
+     
+      The resulting line should look like this:
 
-  2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement
+      ```sql
+      ) WITH "template=partitioned, backups=1, CACHE_NAME=Country,VALUE_TYPE=com.gridgain.training.spring.model.Country";
+      ```
+
+  2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement.  Again, do this within the "s and use a comma to separate the values.
 
       ```sql
       VALUE_TYPE=com.gridgain.training.spring.model.City
       ```
 
-  3. Add the following `KEY_TYPE` property to the `CREATE TABLE City` statement
+  3. Add the following `KEY_TYPE` property to the `CREATE TABLE City` statement.  Once again, do this within the "s and use a comma to separate the values.
 
       ```sql
       KEY_TYPE=com.gridgain.training.spring.model.CityKey
       ```
 
+     The resulting line should look like this:
+     ```sql
+     ) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City,VALUE_TYPE=com.gridgain.training.spring.model.City,KEY_TYPE=com.gridgain.training.spring.model.CityKey";
+     ```
   4. Build a shaded package for the app:
       ```shell script
       mvn clean package -DskipTests=true
@@ -253,7 +276,9 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 9. Create an Ignite Thin Client Application
 1. Create a new java package named `com.gridgain.training.thinclient`.
-  1. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
+
+   
+  2. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
@@ -289,10 +314,16 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   </dependency>
   ```   
 
+ 3.  When maven loads the changes to the POM file, you will likely need to restart the the `ServerNodeStartup` application and reload your data.  You should not need to restart sqlline.  Just reissue the connect and run commands:
+ ```shell
+     !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
+     !run config/world.sql
+ ```
+ 
   3. Add the `ThinClientApplication` class (in the `com.gridgain.training.thinclient` package)that bootstraps the Thin Client Application.
 
   ```java
-  @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class})
+  @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class}, scanBasePackages = "com.gridgain.training.thinclient")
   public class ThinClientApplication {
       public static void main(String[] args) {
           SpringApplication.run(ThinClientApplication.class);
@@ -312,3 +343,13 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
   4. Run the `ThinClientApplication` class/application, and confirm the client node can connect to the server & run the query.
 
+
+**<u>Notes</u>**
+1. You can not run both the thin client and the "Application" at the same time since they will both attempt to run on port 8080.
+   
+2. To be able to run the Application once you have added the thin client code, you **will** have to modify the class definition in the Application class.
+Simply remove the "//" from the `@SpringBootApplication` line.  The result should like the line below.
+
+```java
+@SpringBootApplication (scanBasePackages = "com.gridgain.training.spring", exclude = {IgniteClientAutoConfiguration.class})
+```
