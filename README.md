@@ -315,7 +315,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   3. Add the `ThinClientApplication` class (in the `com.gridgain.training.thinclient` package)that bootstraps the Thin Client Application.
 
   ```java
-  @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class})
+  @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class}scanBasePackages = "com.gridgain.training.thinclient")
   public class ThinClientApplication {
       public static void main(String[] args) {
           SpringApplication.run(ThinClientApplication.class);
