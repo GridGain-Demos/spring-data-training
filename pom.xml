@@ -26,11 +26,7 @@
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.ignite</groupId>
-			<artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+
 		<dependency>
 			<groupId>sqlline</groupId>
 			<artifactId>sqlline</artifactId>
