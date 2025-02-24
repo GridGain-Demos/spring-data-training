@@ -19,8 +19,8 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 
 **<u>Note</u>**  
 
-Although it is be possible to later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
-we strongly suggest that you only use JDK 8 (1.8).
+Although it **is** possible to use later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
+**we strongly suggest that you only use JDK 8 (1.8).**
 
 ## 1. Clone the Project
 
