@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.4</version>
+		<version>2.5.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.gridgain.training</groupId>
@@ -17,8 +17,7 @@
 		<h2.version>1.4.197</h2.version>
 		<ignite.version>2.16.0</ignite.version>
 	</properties>
-
-	<repositories>
+   <repositories>
 		<repository>
 			<id>GridGain External Repository</id>
 			<url>http://www.gridgainsystems.com/nexus/content/repositories/external</url>
@@ -81,7 +80,8 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.gridgain.training.spring.Application</mainClass>
+					<mainClass>com.gridgain.training.thinclient.ThinClientApplication</mainClass>
+					<!-- <jvmArguments add-opens java.base/java.nio=ALL-UNNAMED</jvmArguments> -->
 				</configuration>
 			</plugin>
 

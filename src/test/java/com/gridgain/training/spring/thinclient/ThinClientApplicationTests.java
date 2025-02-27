@@ -3,10 +3,13 @@ package com.gridgain.training.spring;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootTest
+import com.gridgain.training.thinclient.ThinClientApplication;
 
-class ApplicationTests {
+@SpringBootTest(classes = ThinClientApplication.class)
+@ComponentScan  (basePackages= "com.gridgain.training.spring")
+class ThinClientApplicationTests {
 	@Autowired
 	CountryRepository countryRepository;
 

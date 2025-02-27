@@ -1,23 +1,22 @@
 package com.gridgain.training.thinclient;
 
 import org.apache.ignite.springframework.boot.autoconfigure.IgniteAutoConfiguration;
-import org.apache.ignite.springframework.boot.autoconfigure.IgniteClientConfigurer;
+import org.apache.ignite.springframework.boot.autoconfigure.IgniteClientAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.apache.ignite.springdata22.repository.config.EnableIgniteRepositories;
+import org.apache.ignite.Ignite;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class})
+// @Configuration
+@SpringBootApplication (exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class, IgniteClientAutoConfiguration.class})
+@EnableIgniteRepositories (basePackages = "com.gridgain.training.spring")
+@ComponentScan  (basePackages= "com.gridgain.training.spring")
 public class ThinClientApplication {
     public static void main(String[] args) {
         SpringApplication.run(ThinClientApplication.class);
     }
 
-    @Bean
-    IgniteClientConfigurer configurer() {
-        return cfg -> {
-            cfg.setAddresses("127.0.0.1:10800");
-            cfg.setSendBufferSize(64*1024);
-        };
-    }
 }

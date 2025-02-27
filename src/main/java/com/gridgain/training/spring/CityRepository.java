@@ -6,11 +6,12 @@ import org.apache.ignite.springdata22.repository.IgniteRepository;
 import org.apache.ignite.springdata22.repository.config.Query;
 import org.apache.ignite.springdata22.repository.config.RepositoryConfig;
 import org.springframework.stereotype.Repository;
+import org.apache.ignite.springdata22.repository.config.EnableIgniteRepositories;
 
 import javax.cache.Cache;
 import java.util.List;
 
-@RepositoryConfig(cacheName = "City")
+@RepositoryConfig(igniteInstance = "igniteInstance", cacheName = "City")
 @Repository
 public interface CityRepository extends IgniteRepository<City, CityKey> {
     public Cache.Entry<CityKey, City> findById(int id);

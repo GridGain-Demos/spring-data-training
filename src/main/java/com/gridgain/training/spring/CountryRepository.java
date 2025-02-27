@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@RepositoryConfig(cacheName = "Country")
+@RepositoryConfig(igniteInstance = "igniteInstance", cacheName = "Country")
 @Repository
 public interface CountryRepository extends IgniteRepository<Country, String> {
     public List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
