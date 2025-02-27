@@ -250,6 +250,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       ```
 
 ## 8. Create Spring REST Controller
+REST APIs are exposed using a thin client in the branch ThinClientREST. By starting ignite and loading the data (as mentioned in the above steps), this branch can be directly used for the REST APIs. The steps/code given below create a thick client.
 
   1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
 
