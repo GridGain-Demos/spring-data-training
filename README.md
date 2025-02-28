@@ -43,7 +43,13 @@ Run Ignite 2.x cluster by running ```./ignite.sh``` from the $IGNITE_HOME direct
       ```shell script
       mvn spring-boot:run
       ```
-      
+  8. Open Postman and run the query. You may even use curl or any other tool.
+    ```
+      http://localhost:8080/api/mostPopulated?limit=6
+    ```   
+
+
+<img width="859" alt="image" src="https://github.com/user-attachments/assets/fdfde605-9194-4ad0-b378-73be0cedda23" />
 
 # Project Template for Apache Ignite With Spring Boot and Spring Data Training
 
