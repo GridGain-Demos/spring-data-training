@@ -21,7 +21,7 @@ Run Ignite 2.x cluster by running ```./ignite.sh``` from the $IGNITE_HOME direct
       java -cp libs/app.jar sqlline.SqlLine
       ```
 
-  4. Connect to the cluster:
+  4. Connect to the cluster from SQLLine using the connect command:
 
       ```shell script
       !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
