@@ -48,8 +48,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
       <dependency>
          <groupId>org.apache.ignite</groupId>
-         <artifactId>ignite-spring-data-2.2-ext</artifactId>
-         <version>1.0.0</version>
+         <artifactId>spring-data-ignite</artifactId>
+         <version>3.0.0</version>
       </dependency>
 
       <dependency>
