@@ -1,13 +1,17 @@
 package com.gridgain.training.spring.model;
 
+import org.apache.ignite.catalog.annotations.ColumnRef;
+import org.apache.ignite.catalog.annotations.Table;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.apache.ignite.cache.affinity.AffinityKeyMapped;
 
+@Table(
+        colocateBy = { @ColumnRef("COUNTRYCODE")}
+)
 public class CityKey implements Serializable {
     private int ID;
 
-    @AffinityKeyMapped
     private String COUNTRYCODE;
 
     public CityKey(int id, String countryCode) {

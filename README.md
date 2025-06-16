@@ -54,8 +54,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
       <dependency>
          <groupId>org.apache.ignite</groupId>
-         <artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
-         <version>1.0.0</version>
+         <artifactId>spring-boot-ignite-client-autoconfigure</artifactId>
+         <version>3.0.0</version>
       </dependency>
       ```
 
