@@ -1,5 +1,7 @@
 package com.gridgain.training.spring.model;
 
+import org.springframework.data.relational.core.mapping.Column;
+
 import java.math.BigDecimal;
 
 public class Country {
@@ -11,20 +13,27 @@ public class Country {
 
     private int population;
 
+    @Column("SURFACEAREA")
     private BigDecimal surfaceArea;
 
+    @Column("INDEPYEAR")
     private short indepYear;
 
+    @Column("LIFEEXPECTANCY")
     private BigDecimal lifeExpectancy;
 
     private BigDecimal gnp;
 
+    @Column("GNPOLD")
     private BigDecimal gnpOld;
 
+    @Column("LOCALNAME")
     private String localName;
 
+    @Column("GOVERNMENTFORM")
     private String governmentForm;
 
+    @Column("HEADOFSTATE")
     private String headOfState;
 
     private int capital;
