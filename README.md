@@ -106,9 +106,8 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
 
       ```java
-      @RepositoryConfig (cacheName = "Country")
       @Repository
-      public interface CountryRepository extends IgniteRepository<Country, String> {
+      public interface CountryRepository extends CrudRepository<Country, String> {
 
       }
       ```
@@ -116,7 +115,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   2. Add a method that returns countries with a population bigger than provided one:
 
       ```java
-      public List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
+      List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
       ```
 
   3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
@@ -137,25 +136,26 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
 
       ```java
-      @RepositoryConfig(cacheName = "City")
       @Repository
-      public interface CityRepository extends IgniteRepository<City, CityKey> {
+      public interface CityRepository extends CrudRepository<City, Integer> {
       }
       ```
 
   2. Add a query that returns a complete key-value pair:
 
       ```java
-      public Cache.Entry<CityKey, City> findById(int id);
+      Cache.Entry<CityKey, City> findById(int id);
       ```
   3. Add a direct SQL query that joins two tables:
 
       ```java
-      @Query("SELECT city.name, MAX(city.population), country.name FROM country " +
-              "JOIN city ON city.countrycode = country.code " +
-              "GROUP BY city.name, country.name, city.population " +
-              "ORDER BY city.population DESC LIMIT ?")
-      public List<List<?>> findTopXMostPopulatedCities(int limit);
+    record PopulousCity(String cityName, Integer population, String countryName) {}
+
+    @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
+            "JOIN city ON city.countrycode = country.code " +
+            "GROUP BY city.name, country.name, city.population " +
+            "ORDER BY city.population DESC LIMIT :limit")
+    public List<PopulousCity> findTopXMostPopulatedCities(int limit);
       ```
 
   4. Create a test in ApplicationTests to validate the methods respond properly:
@@ -190,7 +190,7 @@ REST APIs are exposed using a thin client in the branch ThinClientREST. By start
 
       ```java
       @GetMapping("/api/mostPopulated")
-      public List<List<?>> getMostPopulatedCities(@RequestParam(value = "limit", required = false) Integer limit) {
+      public List<PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
           return cityRepository.findTopXMostPopulatedCities(limit);
       }
       ```
@@ -199,70 +199,42 @@ REST APIs are exposed using a thin client in the branch ThinClientREST. By start
   
       <http://localhost:8080/api/mostPopulated?limit=5>
 
-## 9. Create an Ignite Thin Client Application
+## 9. Create an Ignite Client Application
 1. Create a new java package named `com.gridgain.training.thinclient`.
 
    
-  2. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
+  2. Add the `SpringIgniteClient` class to the `com.gridgain.training.client` package that performs a join query on the City & Country tables
 
   ```java
   @SpringBootApplication
-  public class IgniteThinClient implements ApplicationRunner {
+public class SpringIgniteClient implements ApplicationRunner {
 
-  	@Autowired
-  	private IgniteClient client;
+    @Autowired
+    private IgniteClient client;
 
-  	private static final String QUERY = "SELECT city.name, MAX(city.population), country.name FROM country JOIN city ON city.countrycode = country.code GROUP BY city.name, country.name, city.population ORDER BY city.population DESC LIMIT ?";
+    private static final String QUERY = "SELECT city.name, MAX(city.population), country.name FROM country JOIN city ON city.countrycode = country.code GROUP BY city.name, country.name, city.population ORDER BY city.population DESC LIMIT ?";
 
-  	@Override
-  	public void run(ApplicationArguments args) throws Exception {
-  		System.out.println("ServiceWithIgniteClient.run");
-  		System.out.println("Cache names existing in cluster: " + client.cacheNames());
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        System.out.println("ServiceWithIgniteClient.run");
+        System.out.println("Cache names existing in cluster: " + client.tables().tables().stream().map(Table::name).toList());
 
-  		ClientCache<CityKey, City> cityCache = client.cache("City");
-  		FieldsQueryCursor<List<?>> cursor = cityCache.query(new SqlFieldsQuery(QUERY).setArgs(3));
-  		System.out.printf("%15s %12s %10s\n", "City", "Country", "Population");
-  		System.out.printf("%15s %12s %10s\n", "===============", "============", "==========");
-  		cursor.forEach((row) -> {
-  			System.out.printf("%15s %12s %10d\n", row.get(0), row.get(2), row.get(1));
-  		});
-  	}
-  }
-  ```
-     
-  2. Add the following to the pom.xml:
-  ```xml
-  <dependency>
-      <groupId>org.apache.ignite</groupId>
-      <artifactId>ignite-spring-boot-thin-client-autoconfigure-ext</artifactId>
-      <version>1.0.0</version>
-  </dependency>
-  ```   
+        var cityCache = client.tables().table("City").recordView(City.class);
+        try (var results = client.sql().execute(null, QUERY, 5)) {
+            System.out.printf("%15s %12s %10s\n", "City", "Country", "Population");
+            System.out.printf("%15s %12s %10s\n", "===============", "============", "==========");
+            while (results.hasNext()) {
+                var row = results.next();
+                System.out.printf("%15s %12s %10d\n", row.stringValue(0), row.stringValue(2), row.intValue(1));
+            }
+        }
+    }
 
- 3.  When maven loads the changes to the POM file, you will likely need to restart the the `ServerNodeStartup` application and reload your data.  You should not need to restart sqlline.  Just reissue the connect and run commands:
- ```shell
-     !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
-     !run config/world.sql
- ```
- 
-  3. Add the `ThinClientApplication` class (in the `com.gridgain.training.thinclient` package)that bootstraps the Thin Client Application.
-
-  ```java
-  @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class}, scanBasePackages = "com.gridgain.training.thinclient")
-  public class ThinClientApplication {
-      public static void main(String[] args) {
-          SpringApplication.run(ThinClientApplication.class);
-      }
-
-      @Bean
-      IgniteClientConfigurer configurer() {
-          return cfg -> {
-          	cfg.setAddresses("127.0.0.1:10800");
-          	cfg.setSendBufferSize(64*1024);
-          };
-      }
-  }
-  ```
+    public static void main(String[] args) {
+        SpringApplication.run(SpringIgniteClient.class, args);
+    }
+}
+```
 
   3. Stop the `Application` application (if it is currently running).  If you do not, you will receive an error about a port conflict.
 
