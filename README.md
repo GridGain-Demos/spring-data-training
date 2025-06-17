@@ -12,7 +12,8 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 ## Setting Up Environment
 
 * GIT command line or GitHub Desktop (<https://desktop.github.com/>)
-* Java Developer Kit, version 8 or later
+* Docker Desktop
+* Java Developer Kit, version 17 or later
 * Apache Maven 3.6.x
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
 * Postman REST tool (<https://www.postman.com/>) or a web browser
@@ -20,7 +21,7 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 **<u>Note</u>**  
 
 Although it **is** possible to use later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
-**we strongly suggest that you only use JDK 8 (1.8).**
+**we strongly suggest that you use JDK 17.** (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.)
 
 ## 1. Clone the Project
 
@@ -30,7 +31,38 @@ Open a terminal window and clone the project to your dev environment:
 git clone https://github.com/GridGain-Demos/spring-data-training.git
 ```
 
-## 2. Configure Ignite Spring Boot and Data Extensions
+## 2. Start your Apache Ignite cluster
+
+1Start your nodes using Docker Compose:
+
+    ```bash
+    docker compose -f docker-compose.yml up -d
+    ```
+
+## 3. Load World Database
+
+1. Open a terminal window and navigate to the root directory of this project.
+2. Load the media store database:
+
+   a. Start the Command Line Interface (CLI)
+
+    ```bash
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network ignite3_default -it apacheignite/ignite:3.0.0 cli
+   ```
+
+   b. Connect to the cluster.
+
+   ```bash
+   connect http://node1:10300
+   ```
+
+   c. Execute SQL command to load the sample data.
+
+   ```bash
+   sql --file=/opt/ignite/downloads/world.sql
+    ```
+
+## 4. Configure Ignite Spring Boot and Data Extensions
 
   1. Enable Ignite Spring Boot and Spring Data extensions by adding the following artifacts to the `pom.xml` file
 
@@ -59,122 +91,14 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       </dependency>
       ```
 
-  2. The following property **has already been added** to the pom.xml to select a version of H2 supported by Ignite so there is **no need to take any action**.  Just remember that this property needs to set in the pom.xml to insure proper function of Ignite.
+## 5. Configure Spring Boot to connect to Ignite
 
-      ```xml
-      <properties>
-          <h2.version>1.4.197</h2.version>
-      </properties>
-      ```
+  1. Update the `application.properties` by adding an option that tells Spring Boot where to find the Ignite server node:
 
-## 3. Start Ignite Server Node With Spring Boot
-
-  1. Add the `IgniteConfig` class in the `com.gridgain.training.spring` package with the following code.  This class returns an instance of Ignite started by Spring Boot:
-
-      ```java
-      @Configuration
-      public class IgniteConfig {
-          @Bean(name = "igniteInstance")
-          public Ignite igniteInstance(Ignite ignite) {
-              return ignite;
-          }
-      }
-      ```
-
-  2. Update the `Application` class by tagging it with `@EnableIgniteRepositories` annotation.
-
-  3. Start the application and confirm Spring Boot started an Ignite server node instance.  You should see logging output something like that below.  
-     The key part is the line in the center that has a timestamp followed by "Topology Snapshot".  This indicates that the Ignite cluster was started 
-     and has one server and zero clients as a part of it.
-
- 
-     ```text
-     >>> Local ports: TCP:10800 TCP:11211 TCP:47100 UDP:47400 TCP:47500
-     >>> +-----------------------------------------------------------------------+
-
-     [15:50:20] Topology snapshot [ver=1, locNode=297d311a, servers=1, clients=0, state=ACTIVE, CPUs=12, offheap=7.2GB, heap=8.0GB]
-     [15:50:20]   ^-- Baseline [id=0, size=1, online=1, offline=0]
-     2025-02-12 15:50:20.886  INFO 11298 --- [           main] o.a.i.i.m.d.GridDiscoveryManager         : Topology snapshot [ver=1, locNode=297d311a, servers=1
-     ```
-
-## 4. Change Spring Boot Settings to Start Ignite Client Node
-
-  1. Update the `IgniteConfig` by adding an `IgniteConfigurer` that tells Spring Boot to start an Ignite **client** node instead of a server node:
-
-      ```java
-       @Bean
-       public IgniteConfigurer configurer() {
-           return igniteConfiguration -> {
-               igniteConfiguration.setClientMode(true);
-           };
-       }
-      ```
-
-  2. Add the `ServerNodeStartup` class (in the `com.gridgain.training.spring` package) that will be used to start a separate application/process for an Ignite server node.
-
-      ```java
-      public class ServerNodeStartup {
-          public static void main(String[] args) {
-              Ignition.start();
-          }
-      }
-      ```
-
-  3. Start the Spring Boot application and the `ServerNodeStartup` application, and confirm the client node can
-  connect to the server.
-
-## 5. Load World Database
-
-  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement.  
-     Be sure to add it inside the "s in the WITH statement and to use a comma to separate the values in the string.
-
-      ```sql
-      VALUE_TYPE=com.gridgain.training.spring.model.Country
-      ```
-     
-      The resulting line should look like this:
-
-      ```sql
-      ) WITH "template=partitioned, backups=1, CACHE_NAME=Country,VALUE_TYPE=com.gridgain.training.spring.model.Country";
-      ```
-
-  2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement.  Again, do this within the "s and use a comma to separate the values.
-
-      ```sql
-      VALUE_TYPE=com.gridgain.training.spring.model.City
-      ```
-
-  3. Add the following `KEY_TYPE` property to the `CREATE TABLE City` statement.  Once again, do this within the "s and use a comma to separate the values.
-
-      ```sql
-      KEY_TYPE=com.gridgain.training.spring.model.CityKey
-      ```
-
-     The resulting line should look like this:
-     ```sql
-     ) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City,VALUE_TYPE=com.gridgain.training.spring.model.City,KEY_TYPE=com.gridgain.training.spring.model.CityKey";
-     ```
-  4. Build a shaded package for the app:
-      ```shell script
-      mvn clean package -DskipTests=true
-      ```
-
-  5. Start an SQLLine process:
-
-      ```shell script
-      java -cp libs/app.jar sqlline.SqlLine
-      ```
-
-  6. Connect to the cluster:
-
-      ```shell script
-      !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
-      ```
-
-  7. Load the database:
-
-      ```shell script
-      !run config/world.sql
+      ```properties
+       ignite.client.addresses=127.0.0.1:10800
+       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
+       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
       ```
 
 ## 6. Run Simple Auto-Generated Queries Via Ignite Repository

@@ -37,8 +37,13 @@
 			<version>${ignite.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.ignite</groupId>
+			<artifactId>ignite-jdbc</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
+			<artifactId>spring-data-jdbc</artifactId>
 		</dependency>
 	</dependencies>
 
