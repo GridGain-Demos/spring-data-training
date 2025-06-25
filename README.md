@@ -141,12 +141,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       }
       ```
 
-  2. Add a query that returns a complete key-value pair:
-
-      ```java
-      Cache.Entry<CityKey, City> findById(int id);
-      ```
-  3. Add a direct SQL query that joins two tables:
+  2. Add a direct SQL query that joins two tables:
 
       ```java
     record PopulousCity(String cityName, Integer population, String countryName) {}
@@ -158,7 +153,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
     public List<PopulousCity> findTopXMostPopulatedCities(int limit);
       ```
 
-  4. Create a test in ApplicationTests to validate the methods respond properly:
+3. Create a test in ApplicationTests to validate the methods respond properly:
 
       ```java
       @Test

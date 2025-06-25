@@ -28,7 +28,7 @@ CREATE TABLE City (
   CountryCode VARCHAR(3),
   District VARCHAR,
   Population INT,
-  PRIMARY KEY (ID, CountryCode)
+  PRIMARY KEY (ID)
 );
 
 CREATE INDEX idx_country_code ON city (CountryCode);
