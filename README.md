@@ -33,16 +33,13 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ## 2. Start your Apache Ignite cluster
 
-1Start your nodes using Docker Compose:
+1. Start your nodes using Docker Compose:
 
     ```bash
     docker compose -f docker-compose.yml up -d
     ```
 
-## 3. Load World Database
-
-1. Open a terminal window and navigate to the root directory of this project.
-2. Load the media store database:
+2. Initialize your cluster:
 
    a. Start the Command Line Interface (CLI)
 
@@ -56,7 +53,19 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    connect http://node1:10300
    ```
 
-   c. Execute SQL command to load the sample data.
+   c. Execute command to initialize the cluster.
+
+   ```bash
+   cluster init --name=spring-data-training
+   ```
+
+Leave the CLI connected to the cluster.
+
+## 3. Load World Database
+
+1. Open a terminal window and navigate to the root directory of this project.
+
+2. Load the media store database by executing the SQL command to load the sample data.
 
    ```bash
    sql --file=/opt/ignite/downloads/world.sql
