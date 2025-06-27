@@ -245,12 +245,6 @@ public class SpringIgniteClient implements ApplicationRunner {
   4. Run the `SpringIgniteClient` class/application, and confirm the client node can connect to the server & run the query.
 
 
-**<u>Notes</u>**
-1. You can not run both the thin client and the "Application" at the same time since they will both attempt to run on port 8080.
-   
-2. To be able to run the Application once you have added the thin client code, you **will** have to modify the class definition in the Application class.
-Simply remove the "//" from the `@SpringBootApplication` line.  The result should like the line below.
+**Notes**
 
-```java
-@SpringBootApplication (scanBasePackages = "com.gridgain.training.spring", exclude = {IgniteClientAutoConfiguration.class})
-```
+* You cannot run both the client application and the "Application" at the same time since they will both attempt to run on port 8080.
