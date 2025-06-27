@@ -204,7 +204,7 @@ REST APIs are exposed using a thin client in the branch ThinClientREST. By start
       <http://localhost:8080/api/mostPopulated?limit=5>
 
 ## 9. Create an Ignite Client Application
-1. Create a new java package named `com.gridgain.training.thinclient`.
+  1. Create a new java package named `com.gridgain.training.client`.
 
    
   2. Add the `SpringIgniteClient` class to the `com.gridgain.training.client` package that performs a join query on the City & Country tables
@@ -242,7 +242,7 @@ public class SpringIgniteClient implements ApplicationRunner {
 
   3. Stop the `Application` application (if it is currently running).  If you do not, you will receive an error about a port conflict.
 
-  4. Run the `ThinClientApplication` class/application, and confirm the client node can connect to the server & run the query.
+  4. Run the `SpringIgniteClient` class/application, and confirm the client node can connect to the server & run the query.
 
 
 **<u>Notes</u>**
