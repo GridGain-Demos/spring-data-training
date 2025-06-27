@@ -56,7 +56,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    c. Execute command to initialize the cluster.
 
    ```bash
-   cluster init --name=spring-data-training
+   cluster init --name=spring-data-training --metastorage-group=node1,node2
    ```
 
 Leave the CLI connected to the cluster.
