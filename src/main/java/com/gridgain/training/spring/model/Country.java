@@ -1,15 +1,12 @@
 package com.gridgain.training.spring.model;
 
-import org.apache.ignite.catalog.annotations.Column;
-import org.apache.ignite.catalog.annotations.Id;
-import org.apache.ignite.catalog.annotations.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
 
-@Table("COUNTRY")
 public class Country {
     @Id
-    @Column(length = 3)
     private String code;
 
     private String name;
@@ -20,19 +17,18 @@ public class Country {
 
     private Integer population;
 
-    @Column(value = "SURFACEAREA", precision = 10, scale = 2)
+    @Column(value = "SURFACEAREA")
     private BigDecimal surfaceArea;
 
     @Column("INDEPYEAR")
     private Short indepYear;
 
-    @Column(value = "LIFEEXPECTANCY", precision = 3, scale = 1)
+    @Column(value = "LIFEEXPECTANCY")
     private BigDecimal lifeExpectancy;
 
-    @Column(precision = 10, scale = 2)
     private BigDecimal gnp;
 
-    @Column(value = "GNPOLD", precision = 10, scale = 2)
+    @Column(value = "GNPOLD")
     private BigDecimal gnpOld;
 
     @Column("LOCALNAME")
@@ -46,7 +42,6 @@ public class Country {
 
     private Integer capital;
 
-    @Column(length = 2)
     private String code2;
 
     public Country() {

@@ -1,17 +1,13 @@
 package com.gridgain.training.spring.model;
 
-import org.apache.ignite.catalog.annotations.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
-@Table(value = "CITY",
-        indexes = { @Index(value = "idx_country_code", columns = @ColumnRef("CountryCode"))}
-)
 public class City {
     @Id
-    @Column
     private Integer id;
 
-    @Id
-    @Column(value = "COUNTRYCODE", length = 3)
+    @Column(value = "COUNTRYCODE")
     private String countryCode;
 
     private String name;
