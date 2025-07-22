@@ -16,12 +16,15 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 * Java Developer Kit, version 17 or later
 * Apache Maven 3.6.x
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
-* Postman REST tool (<https://www.postman.com/>) or a web browser
+* Tool to query a REST endpoint such as:
+  * [Postman REST tool](https://www.postman.com/)
+  * [curl](https://curl.se/)
+  * [httpie](https://httpie.io)
+  * A web browser
 
 **<u>Note</u>**  
 
-Although it **is** possible to use later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
-**we strongly suggest that you use JDK 17.** (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.)
+This project has been tested most thoroughly using Java 17 and Ignite 3. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
 
 ## Hands-on part 1
 
@@ -206,7 +209,7 @@ Leave the CLI connected to the cluster.
           System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
       }
       ```
-      Add following line after ApplicationTests class declaration:
+      Add the following line after ApplicationTests class declaration:
       ```java
       @Autowired CityRepository cityRepository;
       ```
@@ -214,7 +217,8 @@ Leave the CLI connected to the cluster.
 ## Hands-on part 4
 
 ### 8. Create Spring REST Controller
-REST APIs are exposed using a thin client in the branch ThinClientREST. By starting ignite and loading the data (as mentioned in the above steps), this branch can be directly used for the REST APIs. The steps/code given below create a thick client.
+
+In this section, we'll bring together the REST end-points supported by Spring Boot and the database access provided by Spring Data. By starting Ignite and loading the data (as mentioned in the above steps), this code can be directly used for the REST APIs. 
 
   1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
 
@@ -235,6 +239,4 @@ REST APIs are exposed using a thin client in the branch ThinClientREST. By start
       }
       ```
 
-  3.  Restart the `Application` and then test the controller method either in Postman or your browser:
-  
-      <http://localhost:8080/api/mostPopulated?limit=5>
+  3.  Restart the `Application` and then test the controller method either in REST endpoint viewer: http://localhost:8080/api/mostPopulated?limit=5
