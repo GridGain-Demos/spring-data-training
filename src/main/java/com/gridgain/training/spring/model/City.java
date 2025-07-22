@@ -1,21 +1,35 @@
 package com.gridgain.training.spring.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import org.apache.ignite.catalog.annotations.*;
 
-@Table
+@Table(value = "CITY",
+        indexes = { @Index(value = "idx_country_code", columns = @ColumnRef("CountryCode"))}
+)
 public class City {
-    @Id private Integer id;
+    @Id
+    @Column
+    private Integer id;
 
-    @Column("COUNTRYCODE")
+    @Id
+    @Column(value = "COUNTRYCODE", length = 3)
     private String countryCode;
 
     private String name;
 
     private String district;
 
-    private int population;
+    private Integer population;
+
+    public City() {
+    }
+
+    public City(Integer id, String countryCode, String name, String district, Integer population) {
+        this.id = id;
+        this.countryCode = countryCode;
+        this.name = name;
+        this.district = district;
+        this.population = population;
+    }
 
     public Integer getId() {
         return id;
@@ -49,11 +63,11 @@ public class City {
         this.district = district;
     }
 
-    public int getPopulation() {
+    public Integer getPopulation() {
         return population;
     }
 
-    public void setPopulation(int population) {
+    public void setPopulation(Integer population) {
         this.population = population;
     }
 

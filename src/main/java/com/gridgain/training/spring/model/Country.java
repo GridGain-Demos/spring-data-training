@@ -1,30 +1,38 @@
 package com.gridgain.training.spring.model;
 
-import org.springframework.data.relational.core.mapping.Column;
+import org.apache.ignite.catalog.annotations.Column;
+import org.apache.ignite.catalog.annotations.Id;
+import org.apache.ignite.catalog.annotations.Table;
 
 import java.math.BigDecimal;
 
+@Table("COUNTRY")
 public class Country {
+    @Id
+    @Column(length = 3)
+    private String code;
+
     private String name;
 
     private String continent;
 
     private String region;
 
-    private int population;
+    private Integer population;
 
-    @Column("SURFACEAREA")
+    @Column(value = "SURFACEAREA", precision = 10, scale = 2)
     private BigDecimal surfaceArea;
 
     @Column("INDEPYEAR")
-    private short indepYear;
+    private Short indepYear;
 
-    @Column("LIFEEXPECTANCY")
+    @Column(value = "LIFEEXPECTANCY", precision = 3, scale = 1)
     private BigDecimal lifeExpectancy;
 
+    @Column(precision = 10, scale = 2)
     private BigDecimal gnp;
 
-    @Column("GNPOLD")
+    @Column(value = "GNPOLD", precision = 10, scale = 2)
     private BigDecimal gnpOld;
 
     @Column("LOCALNAME")
@@ -36,9 +44,39 @@ public class Country {
     @Column("HEADOFSTATE")
     private String headOfState;
 
-    private int capital;
+    private Integer capital;
 
+    @Column(length = 2)
     private String code2;
+
+    public Country() {
+    }
+
+    public Country(String code, String name, String continent, String region, BigDecimal surfaceArea, Short indepYear, Integer population, BigDecimal lifeExpectancy, BigDecimal gnp, BigDecimal gnpOld, String localName, String governmentForm, String headOfState, Integer capital, String code2) {
+        this.code = code;
+        this.name = name;
+        this.continent = continent;
+        this.region = region;
+        this.population = population;
+        this.surfaceArea = surfaceArea;
+        this.indepYear = indepYear;
+        this.lifeExpectancy = lifeExpectancy;
+        this.gnp = gnp;
+        this.gnpOld = gnpOld;
+        this.localName = localName;
+        this.governmentForm = governmentForm;
+        this.headOfState = headOfState;
+        this.capital = capital;
+        this.code2 = code2;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public String getName() {
         return name;
@@ -64,11 +102,11 @@ public class Country {
         this.region = region;
     }
 
-    public int getPopulation() {
+    public Integer getPopulation() {
         return population;
     }
 
-    public void setPopulation(int population) {
+    public void setPopulation(Integer population) {
         this.population = population;
     }
 
@@ -80,11 +118,11 @@ public class Country {
         this.surfaceArea = surfaceArea;
     }
 
-    public short getIndepYear() {
+    public Short getIndepYear() {
         return indepYear;
     }
 
-    public void setIndepYear(short indepYear) {
+    public void setIndepYear(Short indepYear) {
         this.indepYear = indepYear;
     }
 
@@ -136,11 +174,11 @@ public class Country {
         this.headOfState = headOfState;
     }
 
-    public int getCapital() {
+    public Integer getCapital() {
         return capital;
     }
 
-    public void setCapital(int capital) {
+    public void setCapital(Integer capital) {
         this.capital = capital;
     }
 
