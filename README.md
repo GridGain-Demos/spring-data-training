@@ -23,7 +23,9 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 Although it **is** possible to use later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
 **we strongly suggest that you use JDK 17.** (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.)
 
-## 1. Clone the Project
+## Hands-on part 1
+
+### 1. Clone the Project
 
 Open a terminal window and clone the project to your dev environment:
 
@@ -31,7 +33,7 @@ Open a terminal window and clone the project to your dev environment:
 git clone https://github.com/GridGain-Demos/spring-data-training.git
 ```
 
-## 2. Start your Apache Ignite cluster
+### 2. Start your Apache Ignite cluster
 
 1. Start your nodes using Docker Compose:
 
@@ -61,7 +63,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 Leave the CLI connected to the cluster.
 
-## 3. Load World Database
+### 3. Load World Database
 
 1. Open a terminal window and navigate to the root directory of this project.
 
@@ -71,7 +73,9 @@ Leave the CLI connected to the cluster.
    sql --file=/opt/ignite/downloads/world.sql
     ```
 
-## 4. Configure Ignite Spring Boot and Data Extensions
+## Hands-on part 2 
+
+### 4. Configure Ignite Spring Boot and Data Extensions
 
   1. Enable Ignite Spring Boot and Spring Data extensions by adding the following artifacts to the `pom.xml` file
 
@@ -100,19 +104,49 @@ Leave the CLI connected to the cluster.
       </dependency>
       ```
 
-## 5. Configure Spring Boot to connect to Ignite
+### 5. Configure Spring Boot to connect to Ignite
 
   1. Update the `application.properties` by adding an option that tells Spring Boot where to find the Ignite server node:
 
       ```properties
        ignite.client.addresses=127.0.0.1:10800
-       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
-       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
+      ```
+     
+  2. Edit the `StartupService.java` class. Autowire our connection to the Ignite servers:
+
+      ```java
+      @Autowired
+      private Ignite ignite;
       ```
 
-## 6. Run Simple Auto-Generated Queries Via Ignite Repository
+  3. Add some diagnostics code to run when the server starts:
 
-  1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
+      ```java
+      @EventListener(ApplicationReadyEvent.class)
+      public void startupLogger() {
+          log.info("Table names existing in cluster: {}", ignite.tables().tables().stream().map(Table::name).toList());
+
+          log.info("Node information:");
+          for (var n : ignite.clusterNodes()) {
+              log.info("ID: {}, Name: {}, Address: {}", n.id(), n.name(), n.address());
+          }
+      }
+      ```
+
+  4. Run your new Spring Boot application. It should connect to your Ignite servers and list information about the tables and cluster topology
+
+## Hand-on part 3
+
+### 6. Run Simple Auto-Generated Queries Via Ignite Repository
+
+  1. Return to the `application.properties` file and add some options for Spring Data:
+
+      ```properties
+       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
+       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
+     ```
+     
+  2. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
 
       ```java
       @Repository
@@ -121,13 +155,13 @@ Leave the CLI connected to the cluster.
       }
       ```
 
-  2. Add a method that returns countries with a population bigger than provided one:
+  3. Add a method that returns countries with a population bigger than provided one:
 
       ```java
       List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
       ```
 
-  3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
+  4. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
 
       ```java
       @Test
@@ -135,12 +169,12 @@ Leave the CLI connected to the cluster.
          System.out.println("count=" + countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
       }
       ```
-      Add following line after ApplicationTests class declaration:
+      Add the following line after ApplicationTests class declaration:
       ```java
       @Autowired CountryRepository countryRepository;
       ```
 
-## 7. Run Direct Queries With JOINs Via Ignite Repository
+### 7. Run Direct Queries With JOINs Via Ignite Repository
 
   1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
 
@@ -177,7 +211,9 @@ Leave the CLI connected to the cluster.
       @Autowired CityRepository cityRepository;
       ```
 
-## 8. Create Spring REST Controller
+## Hands-on part 4
+
+### 8. Create Spring REST Controller
 REST APIs are exposed using a thin client in the branch ThinClientREST. By starting ignite and loading the data (as mentioned in the above steps), this branch can be directly used for the REST APIs. The steps/code given below create a thick client.
 
   1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
@@ -202,49 +238,3 @@ REST APIs are exposed using a thin client in the branch ThinClientREST. By start
   3.  Restart the `Application` and then test the controller method either in Postman or your browser:
   
       <http://localhost:8080/api/mostPopulated?limit=5>
-
-## 9. Create an Ignite Client Application
-  1. Create a new java package named `com.gridgain.training.client`.
-
-   
-  2. Add the `SpringIgniteClient` class to the `com.gridgain.training.client` package that performs a join query on the City & Country tables
-
-  ```java
-  @SpringBootApplication
-public class SpringIgniteClient implements ApplicationRunner {
-
-    @Autowired
-    private IgniteClient client;
-
-    private static final String QUERY = "SELECT city.name, MAX(city.population), country.name FROM country JOIN city ON city.countrycode = country.code GROUP BY city.name, country.name, city.population ORDER BY city.population DESC LIMIT ?";
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        System.out.println("ServiceWithIgniteClient.run");
-        System.out.println("Cache names existing in cluster: " + client.tables().tables().stream().map(Table::name).toList());
-
-        var cityCache = client.tables().table("City").recordView(City.class);
-        try (var results = client.sql().execute(null, QUERY, 5)) {
-            System.out.printf("%15s %12s %10s\n", "City", "Country", "Population");
-            System.out.printf("%15s %12s %10s\n", "===============", "============", "==========");
-            while (results.hasNext()) {
-                var row = results.next();
-                System.out.printf("%15s %12s %10d\n", row.stringValue(0), row.stringValue(2), row.intValue(1));
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(SpringIgniteClient.class, args);
-    }
-}
-```
-
-  3. Stop the `Application` application (if it is currently running).  If you do not, you will receive an error about a port conflict.
-
-  4. Run the `SpringIgniteClient` class/application, and confirm the client node can connect to the server & run the query.
-
-
-**Notes**
-
-* You cannot run both the client application and the "Application" at the same time since they will both attempt to run on port 8080.
