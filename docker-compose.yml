@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: ignite3
+name: spring-boot-data-training
 
 x-ignite-def:
   &ignite-def

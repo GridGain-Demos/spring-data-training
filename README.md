@@ -49,7 +49,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    a. Start the Command Line Interface (CLI)
 
     ```bash
-   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network ignite3_default -it apacheignite/ignite:3.0.0 cli
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.0.0 cli
    ```
 
    b. Connect to the cluster.
@@ -113,6 +113,8 @@ Leave the CLI connected to the cluster.
 
       ```properties
        ignite.client.addresses=127.0.0.1:10800
+       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
+       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
       ```
      
   2. Edit the `StartupService.java` class. Autowire our connection to the Ignite servers:
@@ -142,14 +144,7 @@ Leave the CLI connected to the cluster.
 
 ### 6. Run Simple Auto-Generated Queries Via Ignite Repository
 
-  1. Return to the `application.properties` file and add some options for Spring Data:
-
-      ```properties
-       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
-       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
-     ```
-     
-  2. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
+  1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
 
       ```java
       @Repository
@@ -158,24 +153,32 @@ Leave the CLI connected to the cluster.
       }
       ```
 
-  3. Add a method that returns countries with a population bigger than provided one:
+  2. Add a method that returns countries with a population bigger than provided one:
 
       ```java
       List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
       ```
 
-  4. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
+  3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
 
       ```java
       @Test
       void countryRepositoryWorks() {
-         System.out.println("count=" + countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
+		var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
+		System.out.println("count=" + results.size());
+		Assertions.assertTrue(results.size() > 0);
       }
       ```
       Add the following line after ApplicationTests class declaration:
       ```java
       @Autowired CountryRepository countryRepository;
       ```
+     
+  4. Run the tests:
+
+    ```shell
+    mvn compile test
+    ```
 
 ### 7. Run Direct Queries With JOINs Via Ignite Repository
 
@@ -213,6 +216,12 @@ Leave the CLI connected to the cluster.
       ```java
       @Autowired CityRepository cityRepository;
       ```
+   
+  4. Run the tests:
+
+     ```shell
+     mvn compile test
+     ```
 
 ## Hands-on part 4
 
@@ -233,8 +242,8 @@ In this section, we'll bring together the REST end-points supported by Spring Bo
   2. Add a method that returns top X most populated cities:
 
       ```java
-      @GetMapping("/api/mostPopulated")
-      public List<PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
+      import com.gridgain.training.spring.CityRepository;@GetMapping("/api/mostPopulated")
+      public List<CityRepository.PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
           return cityRepository.findTopXMostPopulatedCities(limit);
       }
       ```
