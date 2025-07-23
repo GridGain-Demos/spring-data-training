@@ -127,6 +127,8 @@ Leave the CLI connected to the cluster.
   3. Add some diagnostics code to run when the server starts:
 
       ```java
+     	private Logger log = LoggerFactory.getLogger(Application.class);
+
       @EventListener(ApplicationReadyEvent.class)
       public void startupLogger() {
           log.info("Table names existing in cluster: {}", ignite.tables().tables().stream().map(Table::name).toList());
