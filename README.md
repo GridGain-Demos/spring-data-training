@@ -195,13 +195,13 @@ Leave the CLI connected to the cluster.
   2. Add a direct SQL query that joins two tables:
 
       ```java
-    record PopulousCity(String cityName, Integer population, String countryName) {}
+      record PopulousCity(String cityName, Integer population, String countryName) {}
 
-    @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
+      @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
             "JOIN city ON city.countrycode = country.code " +
             "GROUP BY city.name, country.name, city.population " +
             "ORDER BY city.population DESC LIMIT :limit")
-    public List<PopulousCity> findTopXMostPopulatedCities(int limit);
+      public List<PopulousCity> findTopXMostPopulatedCities(int limit);
       ```
 
 3. Create a test in ApplicationTests to validate the methods respond properly:
