@@ -208,12 +208,17 @@ Leave the CLI connected to the cluster.
 
       ```java
       @Test
-      void cityRepositoryWorks() {
-          System.out.println("city = " + cityRepository.findById(34));
+	  void cityRepositoryWorks() {
+		  var city = cityRepository.findById(34);
+		  Assertions.assertTrue(city.isPresent());
+          Assertions.assertEquals("Tirana", city.get().getName());
 
-          System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
-      }
+		  var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
+		  Assertions.assertEquals(5, populatedCities.size());
+		  Assertions.assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
+	  }
       ```
+   
       Add the following line after ApplicationTests class declaration:
       ```java
       @Autowired CityRepository cityRepository;
