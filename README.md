@@ -95,15 +95,15 @@ Leave the CLI connected to the cluster.
       </dependency>
 
       <dependency>
-         <groupId>org.apache.ignite</groupId>
+         <groupId>${ignite.project}</groupId>
          <artifactId>spring-data-ignite</artifactId>
-         <version>3.0.0</version>
+         <version>${ignite.version}</version>
       </dependency>
 
       <dependency>
-         <groupId>org.apache.ignite</groupId>
+         <groupId>${ignite.project}</groupId>
          <artifactId>spring-boot-ignite-client-autoconfigure</artifactId>
-         <version>3.0.0</version>
+         <version>${ignite.version}</version>
       </dependency>
       ```
 
