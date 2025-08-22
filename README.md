@@ -38,19 +38,32 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ### 2. Start your Apache Ignite cluster
 
-1. Start your nodes using Docker Compose:
+1. Start your nodes using Docker Compose. Using Apache Ignite 3:
 
     ```bash
     docker compose -f docker-compose.yml up -d
     ```
 
+    Or GridGain 9:
+
+    ```bash
+    docker compose -f docker-compose-gg9.yml up -d
+    ```
+
 2. Initialize your cluster:
 
-   a. Start the Command Line Interface (CLI)
+   a. Start the Command Line Interface (CLI).  Using Apache Ignite 3:
 
     ```bash
    docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.0.0 cli
    ```
+
+   Or GridGain 9:
+
+    ```bash
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./gridgain-license.json:/opt/ignite/downloads/gridgain-license.json -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.0 cli
+   ```
+   (Ensure your license file is in your current directory.)
 
    b. Connect to the cluster.
 
@@ -58,10 +71,16 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    connect http://node1:10300
    ```
 
-   c. Execute command to initialize the cluster.
+   c. Execute command to initialize the cluster. Using Apache Ignite 3:
 
    ```bash
    cluster init --name=spring-data-training --metastorage-group=node1,node2
+   ```
+
+   Or GridGain 9:
+
+   ```bash
+   cluster init --name=spring-data-training --metastorage-group=node1,node2 --license=/opt/ignite/downloads/gridgain-license.json
    ```
 
 Leave the CLI connected to the cluster.
