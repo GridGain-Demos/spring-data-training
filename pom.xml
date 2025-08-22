@@ -28,11 +28,6 @@
 
 		<dependency>
 			<groupId>org.apache.ignite</groupId>
-			<artifactId>ignite-runner</artifactId>
-			<version>${ignite.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ignite</groupId>
 			<artifactId>ignite-client</artifactId>
 			<version>${ignite.version}</version>
 		</dependency>
