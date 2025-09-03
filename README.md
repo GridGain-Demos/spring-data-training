@@ -121,7 +121,7 @@ Leave the CLI connected to the cluster.
 
       <dependency>
          <groupId>${ignite.project}</groupId>
-         <artifactId>spring-boot-ignite-client-autoconfigure</artifactId>
+         <artifactId>spring-boot-starter-ignite-client</artifactId>
          <version>${ignite.version}</version>
       </dependency>
       ```
@@ -146,7 +146,7 @@ Leave the CLI connected to the cluster.
   3. Add some diagnostics code to run when the server starts:
 
       ```java
-     	private Logger log = LoggerFactory.getLogger(Application.class);
+      private Logger log = LoggerFactory.getLogger(Application.class);
 
       @EventListener(ApplicationReadyEvent.class)
       public void startupLogger() {
@@ -268,7 +268,7 @@ In this section, we'll bring together the REST end-points supported by Spring Bo
   2. Add a method that returns top X most populated cities:
 
       ```java
-      import com.gridgain.training.spring.CityRepository;@GetMapping("/api/mostPopulated")
+      @GetMapping("/api/mostPopulated")
       public List<CityRepository.PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
           return cityRepository.findTopXMostPopulatedCities(limit);
       }
