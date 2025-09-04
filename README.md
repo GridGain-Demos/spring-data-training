@@ -126,6 +126,12 @@ Leave the CLI connected to the cluster.
       </dependency>
       ```
 
+  2. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
+
+      ```properties
+     org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=org.apache.ignite.data.IgniteDialectProvider
+     ```
+
 ### 5. Configure Spring Boot to connect to Ignite
 
   1. Update the `application.properties` by adding an option that tells Spring Boot where to find the Ignite server node:
