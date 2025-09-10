@@ -1,35 +1,77 @@
 package com.gridgain.training.spring.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+
 import java.math.BigDecimal;
 
 public class Country {
+    @Id
+    private String code;
+
     private String name;
 
     private String continent;
 
     private String region;
 
-    private int population;
+    private Integer population;
 
+    @Column(value = "SURFACEAREA")
     private BigDecimal surfaceArea;
 
-    private short indepYear;
+    @Column("INDEPYEAR")
+    private Short indepYear;
 
+    @Column(value = "LIFEEXPECTANCY")
     private BigDecimal lifeExpectancy;
 
     private BigDecimal gnp;
 
+    @Column(value = "GNPOLD")
     private BigDecimal gnpOld;
 
+    @Column("LOCALNAME")
     private String localName;
 
+    @Column("GOVERNMENTFORM")
     private String governmentForm;
 
+    @Column("HEADOFSTATE")
     private String headOfState;
 
-    private int capital;
+    private Integer capital;
 
     private String code2;
+
+    public Country() {
+    }
+
+    public Country(String code, String name, String continent, String region, BigDecimal surfaceArea, Short indepYear, Integer population, BigDecimal lifeExpectancy, BigDecimal gnp, BigDecimal gnpOld, String localName, String governmentForm, String headOfState, Integer capital, String code2) {
+        this.code = code;
+        this.name = name;
+        this.continent = continent;
+        this.region = region;
+        this.population = population;
+        this.surfaceArea = surfaceArea;
+        this.indepYear = indepYear;
+        this.lifeExpectancy = lifeExpectancy;
+        this.gnp = gnp;
+        this.gnpOld = gnpOld;
+        this.localName = localName;
+        this.governmentForm = governmentForm;
+        this.headOfState = headOfState;
+        this.capital = capital;
+        this.code2 = code2;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public String getName() {
         return name;
@@ -55,11 +97,11 @@ public class Country {
         this.region = region;
     }
 
-    public int getPopulation() {
+    public Integer getPopulation() {
         return population;
     }
 
-    public void setPopulation(int population) {
+    public void setPopulation(Integer population) {
         this.population = population;
     }
 
@@ -71,11 +113,11 @@ public class Country {
         this.surfaceArea = surfaceArea;
     }
 
-    public short getIndepYear() {
+    public Short getIndepYear() {
         return indepYear;
     }
 
-    public void setIndepYear(short indepYear) {
+    public void setIndepYear(Short indepYear) {
         this.indepYear = indepYear;
     }
 
@@ -127,11 +169,11 @@ public class Country {
         this.headOfState = headOfState;
     }
 
-    public int getCapital() {
+    public Integer getCapital() {
         return capital;
     }
 
-    public void setCapital(int capital) {
+    public void setCapital(Integer capital) {
         this.capital = capital;
     }
 

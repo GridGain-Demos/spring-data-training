@@ -12,17 +12,23 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 ## Setting Up Environment
 
 * GIT command line or GitHub Desktop (<https://desktop.github.com/>)
-* Java Developer Kit, version 8 or later
+* Docker Desktop
+* Java Developer Kit, version 17 or later
 * Apache Maven 3.6.x
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
-* Postman REST tool (<https://www.postman.com/>) or a web browser
+* Tool to query a REST endpoint such as:
+  * [Postman REST tool](https://www.postman.com/)
+  * [curl](https://curl.se/)
+  * [httpie](https://httpie.io)
+  * A web browser
 
 **<u>Note</u>**  
 
-Although it **is** possible to use later versions of the JDK by following the instructions at <https://ignite.apache.org/docs/latest/quick-start/java#running-ignite-with-java-11-or-later>, 
-**we strongly suggest that you only use JDK 8 (1.8).**
+This project has been tested most thoroughly using Java 17 and Ignite 3. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
 
-## 1. Clone the Project
+## Hands-on part 1
+
+### 1. Clone the Project
 
 Open a terminal window and clone the project to your dev environment:
 
@@ -30,7 +36,68 @@ Open a terminal window and clone the project to your dev environment:
 git clone https://github.com/GridGain-Demos/spring-data-training.git
 ```
 
-## 2. Configure Ignite Spring Boot and Data Extensions
+### 2. Start your Apache Ignite cluster
+
+1. Start your nodes using Docker Compose. Using Apache Ignite 3:
+
+    ```bash
+    docker compose -f docker-compose.yml up -d
+    ```
+
+    Or GridGain 9:
+
+    ```bash
+    docker compose -f docker-compose-gg9.yml up -d
+    ```
+
+2. Initialize your cluster:
+
+   a. Start the Command Line Interface (CLI).  Using Apache Ignite 3:
+
+    ```bash
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.0.0 cli
+   ```
+
+   Or GridGain 9:
+
+    ```bash
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./gridgain-license.json:/opt/ignite/downloads/gridgain-license.json -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.0 cli
+   ```
+   (Ensure your license file is in your current directory.)
+
+   b. Connect to the cluster.
+
+   ```bash
+   connect http://node1:10300
+   ```
+
+   c. Execute command to initialize the cluster. Using Apache Ignite 3:
+
+   ```bash
+   cluster init --name=spring-data-training --metastorage-group=node1,node2
+   ```
+
+   Or GridGain 9:
+
+   ```bash
+   cluster init --name=spring-data-training --metastorage-group=node1,node2 --license=/opt/ignite/downloads/gridgain-license.json
+   ```
+
+Leave the CLI connected to the cluster.
+
+### 3. Load World Database
+
+1. Open a terminal window and navigate to the root directory of this project.
+
+2. Load the media store database by executing the SQL command to load the sample data.
+
+   ```bash
+   sql --file=/opt/ignite/downloads/world.sql
+    ```
+
+## Hands-on part 2 
+
+### 4. Configure Ignite Spring Boot and Data Extensions
 
   1. Enable Ignite Spring Boot and Spring Data extensions by adding the following artifacts to the `pom.xml` file
 
@@ -42,149 +109,78 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
       <dependency>
         <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jdbc</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
         <scope>test</scope>
       </dependency>
 
       <dependency>
-         <groupId>org.apache.ignite</groupId>
-         <artifactId>ignite-spring-data-2.2-ext</artifactId>
-         <version>1.0.0</version>
+         <groupId>${ignite.project}</groupId>
+         <artifactId>spring-data-ignite</artifactId>
+         <version>${ignite.version}</version>
       </dependency>
 
       <dependency>
-         <groupId>org.apache.ignite</groupId>
-         <artifactId>ignite-spring-boot-autoconfigure-ext</artifactId>
-         <version>1.0.0</version>
+         <groupId>${ignite.project}</groupId>
+         <artifactId>spring-boot-starter-ignite-client</artifactId>
+         <version>${ignite.version}</version>
       </dependency>
       ```
 
-  2. The following property **has already been added** to the pom.xml to select a version of H2 supported by Ignite so there is **no need to take any action**.  Just remember that this property needs to set in the pom.xml to insure proper function of Ignite.
+  2. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
 
-      ```xml
-      <properties>
-          <h2.version>1.4.197</h2.version>
-      </properties>
-      ```
-
-## 3. Start Ignite Server Node With Spring Boot
-
-  1. Add the `IgniteConfig` class in the `com.gridgain.training.spring` package with the following code.  This class returns an instance of Ignite started by Spring Boot:
-
-      ```java
-      @Configuration
-      public class IgniteConfig {
-          @Bean(name = "igniteInstance")
-          public Ignite igniteInstance(Ignite ignite) {
-              return ignite;
-          }
-      }
-      ```
-
-  2. Update the `Application` class by tagging it with `@EnableIgniteRepositories` annotation.
-
-  3. Start the application and confirm Spring Boot started an Ignite server node instance.  You should see logging output something like that below.  
-     The key part is the line in the center that has a timestamp followed by "Topology Snapshot".  This indicates that the Ignite cluster was started 
-     and has one server and zero clients as a part of it.
-
- 
-     ```text
-     >>> Local ports: TCP:10800 TCP:11211 TCP:47100 UDP:47400 TCP:47500
-     >>> +-----------------------------------------------------------------------+
-
-     [15:50:20] Topology snapshot [ver=1, locNode=297d311a, servers=1, clients=0, state=ACTIVE, CPUs=12, offheap=7.2GB, heap=8.0GB]
-     [15:50:20]   ^-- Baseline [id=0, size=1, online=1, offline=0]
-     2025-02-12 15:50:20.886  INFO 11298 --- [           main] o.a.i.i.m.d.GridDiscoveryManager         : Topology snapshot [ver=1, locNode=297d311a, servers=1
+      ```properties
+     org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=org.apache.ignite.data.IgniteDialectProvider
      ```
 
-## 4. Change Spring Boot Settings to Start Ignite Client Node
+### 5. Configure Spring Boot to connect to Ignite
 
-  1. Update the `IgniteConfig` by adding an `IgniteConfigurer` that tells Spring Boot to start an Ignite **client** node instead of a server node:
+  1. Update the `application.properties` by adding an option that tells Spring Boot where to find the Ignite server node:
 
-      ```java
-       @Bean
-       public IgniteConfigurer configurer() {
-           return igniteConfiguration -> {
-               igniteConfiguration.setClientMode(true);
-           };
-       }
-      ```
-
-  2. Add the `ServerNodeStartup` class (in the `com.gridgain.training.spring` package) that will be used to start a separate application/process for an Ignite server node.
-
-      ```java
-      public class ServerNodeStartup {
-          public static void main(String[] args) {
-              Ignition.start();
-          }
-      }
-      ```
-
-  3. Start the Spring Boot application and the `ServerNodeStartup` application, and confirm the client node can
-  connect to the server.
-
-## 5. Load World Database
-
-  1. Open the `world.sql` script in the project's `config` folder and add the `VALUE_TYPE` property to the `CREATE TABLE Country` statement.  
-     Be sure to add it inside the "s in the WITH statement and to use a comma to separate the values in the string.
-
-      ```sql
-      VALUE_TYPE=com.gridgain.training.spring.model.Country
+      ```properties
+       ignite.client.addresses=127.0.0.1:10800
+       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
+       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
       ```
      
-      The resulting line should look like this:
+  2. Edit the `Application.java` class. Autowire our connection to the Ignite servers:
 
-      ```sql
-      ) WITH "template=partitioned, backups=1, CACHE_NAME=Country,VALUE_TYPE=com.gridgain.training.spring.model.Country";
+      ```java
+      @Autowired
+      private Ignite ignite;
       ```
 
-  2. Add the following `VALUE_TYPE` property to the `CREATE TABLE City` statement.  Again, do this within the "s and use a comma to separate the values.
+  3. Add some diagnostics code to run when the server starts:
 
-      ```sql
-      VALUE_TYPE=com.gridgain.training.spring.model.City
+      ```java
+      private Logger log = LoggerFactory.getLogger(Application.class);
+
+      @EventListener(ApplicationReadyEvent.class)
+      public void startupLogger() {
+          log.info("Table names existing in cluster: {}", ignite.tables().tables().stream().map(Table::name).toList());
+
+          log.info("Node information:");
+          for (var n : ignite.clusterNodes()) {
+              log.info("ID: {}, Name: {}, Address: {}", n.id(), n.name(), n.address());
+          }
+      }
       ```
 
-  3. Add the following `KEY_TYPE` property to the `CREATE TABLE City` statement.  Once again, do this within the "s and use a comma to separate the values.
+  4. Run your new Spring Boot application. It should connect to your Ignite servers and list information about the tables and cluster topology
 
-      ```sql
-      KEY_TYPE=com.gridgain.training.spring.model.CityKey
-      ```
+## Hand-on part 3
 
-     The resulting line should look like this:
-     ```sql
-     ) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City,VALUE_TYPE=com.gridgain.training.spring.model.City,KEY_TYPE=com.gridgain.training.spring.model.CityKey";
-     ```
-  4. Build a shaded package for the app:
-      ```shell script
-      mvn clean package -DskipTests=true
-      ```
-
-  5. Start an SQLLine process:
-
-      ```shell script
-      java -cp libs/app.jar sqlline.SqlLine
-      ```
-
-  6. Connect to the cluster:
-
-      ```shell script
-      !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
-      ```
-
-  7. Load the database:
-
-      ```shell script
-      !run config/world.sql
-      ```
-
-## 6. Run Simple Auto-Generated Queries Via Ignite Repository
+### 6. Run Simple Auto-Generated Queries Via Ignite Repository
 
   1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
 
       ```java
-      @RepositoryConfig (cacheName = "Country")
       @Repository
-      public interface CountryRepository extends IgniteRepository<Country, String> {
+      public interface CountryRepository extends CrudRepository<Country, String> {
 
       }
       ```
@@ -192,7 +188,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
   2. Add a method that returns countries with a population bigger than provided one:
 
       ```java
-      public List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
+      List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
       ```
 
   3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
@@ -200,57 +196,75 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
       ```java
       @Test
       void countryRepositoryWorks() {
-         System.out.println("count=" + countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
+		var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
+		System.out.println("count=" + results.size());
+		Assertions.assertTrue(results.size() > 0);
       }
       ```
-      Add following line after ApplicationTests class declaration:
+      Add the following line after ApplicationTests class declaration:
       ```java
       @Autowired CountryRepository countryRepository;
       ```
+     
+  4. Run the tests:
 
-## 7. Run Direct Queries With JOINs Via Ignite Repository
+    ```shell
+    mvn compile test
+    ```
+
+### 7. Run Direct Queries With JOINs Via Ignite Repository
 
   1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
 
       ```java
-      @RepositoryConfig(cacheName = "City")
       @Repository
-      public interface CityRepository extends IgniteRepository<City, CityKey> {
+      public interface CityRepository extends CrudRepository<City, Integer> {
       }
       ```
 
-  2. Add a query that returns a complete key-value pair:
+  2. Add a direct SQL query that joins two tables:
 
       ```java
-      public Cache.Entry<CityKey, City> findById(int id);
-      ```
-  3. Add a direct SQL query that joins two tables:
+      record PopulousCity(String cityName, Integer population, String countryName) {}
 
-      ```java
-      @Query("SELECT city.name, MAX(city.population), country.name FROM country " +
-              "JOIN city ON city.countrycode = country.code " +
-              "GROUP BY city.name, country.name, city.population " +
-              "ORDER BY city.population DESC LIMIT ?")
-      public List<List<?>> findTopXMostPopulatedCities(int limit);
+      @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
+            "JOIN city ON city.countrycode = country.code " +
+            "GROUP BY city.name, country.name, city.population " +
+            "ORDER BY city.population DESC LIMIT :limit")
+      public List<PopulousCity> findTopXMostPopulatedCities(int limit);
       ```
 
-  4. Create a test in ApplicationTests to validate the methods respond properly:
+3. Create a test in ApplicationTests to validate the methods respond properly:
 
       ```java
       @Test
-      void cityRepositoryWorks() {
-          System.out.println("city = " + cityRepository.findById(34));
+	  void cityRepositoryWorks() {
+		  var city = cityRepository.findById(34);
+		  Assertions.assertTrue(city.isPresent());
+          Assertions.assertEquals("Tirana", city.get().getName());
 
-          System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
-      }
+		  var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
+		  Assertions.assertEquals(5, populatedCities.size());
+		  Assertions.assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
+	  }
       ```
-      Add following line after ApplicationTests class declaration:
+   
+      Add the following line after ApplicationTests class declaration:
       ```java
       @Autowired CityRepository cityRepository;
       ```
+   
+  4. Run the tests:
 
-## 8. Create Spring REST Controller
-REST APIs are exposed using a thin client in the branch ThinClientREST. By starting ignite and loading the data (as mentioned in the above steps), this branch can be directly used for the REST APIs. The steps/code given below create a thick client.
+     ```shell
+     mvn compile test
+     ```
+
+## Hands-on part 4
+
+### 8. Create Spring REST Controller
+
+In this section, we'll bring together the REST end-points supported by Spring Boot and the database access provided by Spring Data. By starting Ignite and loading the data (as mentioned in the above steps), this code can be directly used for the REST APIs. 
 
   1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
 
@@ -266,91 +280,9 @@ REST APIs are exposed using a thin client in the branch ThinClientREST. By start
 
       ```java
       @GetMapping("/api/mostPopulated")
-      public List<List<?>> getMostPopulatedCities(@RequestParam(value = "limit", required = false) Integer limit) {
+      public List<CityRepository.PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
           return cityRepository.findTopXMostPopulatedCities(limit);
       }
       ```
 
-  3.  Restart the `Application` and then test the controller method either in Postman or your browser:
-  
-      <http://localhost:8080/api/mostPopulated?limit=5>
-
-## 9. Create an Ignite Thin Client Application
-1. Create a new java package named `com.gridgain.training.thinclient`.
-
-   
-  2. Add the `IgniteThinClient` class to the `com.gridgain.training.thinclient` package that performs a join query on the City & Country tables
-
-  ```java
-  @SpringBootApplication
-  public class IgniteThinClient implements ApplicationRunner {
-
-  	@Autowired
-  	private IgniteClient client;
-
-  	private static final String QUERY = "SELECT city.name, MAX(city.population), country.name FROM country JOIN city ON city.countrycode = country.code GROUP BY city.name, country.name, city.population ORDER BY city.population DESC LIMIT ?";
-
-  	@Override
-  	public void run(ApplicationArguments args) throws Exception {
-  		System.out.println("ServiceWithIgniteClient.run");
-  		System.out.println("Cache names existing in cluster: " + client.cacheNames());
-
-  		ClientCache<CityKey, City> cityCache = client.cache("City");
-  		FieldsQueryCursor<List<?>> cursor = cityCache.query(new SqlFieldsQuery(QUERY).setArgs(3));
-  		System.out.printf("%15s %12s %10s\n", "City", "Country", "Population");
-  		System.out.printf("%15s %12s %10s\n", "===============", "============", "==========");
-  		cursor.forEach((row) -> {
-  			System.out.printf("%15s %12s %10d\n", row.get(0), row.get(2), row.get(1));
-  		});
-  	}
-  }
-  ```
-     
-  2. Add the following to the pom.xml:
-  ```xml
-  <dependency>
-      <groupId>org.apache.ignite</groupId>
-      <artifactId>ignite-spring-boot-thin-client-autoconfigure-ext</artifactId>
-      <version>1.0.0</version>
-  </dependency>
-  ```   
-
- 3.  When maven loads the changes to the POM file, you will likely need to restart the the `ServerNodeStartup` application and reload your data.  You should not need to restart sqlline.  Just reissue the connect and run commands:
- ```shell
-     !connect jdbc:ignite:thin://127.0.0.1/ ignite ignite
-     !run config/world.sql
- ```
- 
-  3. Add the `ThinClientApplication` class (in the `com.gridgain.training.thinclient` package)that bootstraps the Thin Client Application.
-
-  ```java
-  @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, IgniteAutoConfiguration.class}, scanBasePackages = "com.gridgain.training.thinclient")
-  public class ThinClientApplication {
-      public static void main(String[] args) {
-          SpringApplication.run(ThinClientApplication.class);
-      }
-
-      @Bean
-      IgniteClientConfigurer configurer() {
-          return cfg -> {
-          	cfg.setAddresses("127.0.0.1:10800");
-          	cfg.setSendBufferSize(64*1024);
-          };
-      }
-  }
-  ```
-
-  3. Stop the `Application` application (if it is currently running).  If you do not, you will receive an error about a port conflict.
-
-  4. Run the `ThinClientApplication` class/application, and confirm the client node can connect to the server & run the query.
-
-
-**<u>Notes</u>**
-1. You can not run both the thin client and the "Application" at the same time since they will both attempt to run on port 8080.
-   
-2. To be able to run the Application once you have added the thin client code, you **will** have to modify the class definition in the Application class.
-Simply remove the "//" from the `@SpringBootApplication` line.  The result should like the line below.
-
-```java
-@SpringBootApplication (scanBasePackages = "com.gridgain.training.spring", exclude = {IgniteClientAutoConfiguration.class})
-```
+  3.  Restart the `Application` and then test the controller method either in REST endpoint viewer: http://localhost:8080/api/mostPopulated?limit=5

@@ -1,7 +1,9 @@
+ALTER ZONE "Default" SET replicas=2;
+
 DROP TABLE IF EXISTS Country;
 
 CREATE TABLE Country (
-  Code CHAR(3) PRIMARY KEY,
+  Code VARCHAR(3) PRIMARY KEY,
   Name VARCHAR,
   Continent VARCHAR,
   Region VARCHAR,
@@ -15,24 +17,21 @@ CREATE TABLE Country (
   GovernmentForm VARCHAR,
   HeadOfState VARCHAR,
   Capital INT,
-  Code2 CHAR(2)
-) WITH "template=partitioned, backups=1, CACHE_NAME=Country";
+  Code2 VARCHAR(2)
+);
 
 DROP TABLE IF EXISTS City;
 
 CREATE TABLE City (
   ID INT,
   Name VARCHAR,
-  CountryCode CHAR(3),
+  CountryCode VARCHAR(3),
   District VARCHAR,
   Population INT,
-  PRIMARY KEY (ID, CountryCode)
-) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City";
+  PRIMARY KEY (ID)
+);
 
 CREATE INDEX idx_country_code ON city (CountryCode);
-
-
-SET STREAMING ON;
 
 INSERT INTO City(ID, Name, CountryCode, District, Population) VALUES (1,'Kabul','AFG','Kabol',1780000);
 INSERT INTO City(ID, Name, CountryCode, District, Population) VALUES (2,'Qandahar','AFG','Qandahar',237500);
@@ -4354,5 +4353,3 @@ INSERT INTO Country(Code, Name, Continent, Region, SurfaceArea, IndepYear, Popul
 INSERT INTO Country(Code, Name, Continent, Region, SurfaceArea, IndepYear, Population, LifeExpectancy, GNP, GNPOld, LocalName, GovernmentForm, HeadOfState, Capital, Code2) VALUES ('ZAF','South Africa','Africa','Southern Africa',1221037.00,1910,40377000,51.1,116729.00,129092.00,'South Africa','Republic','Thabo Mbeki',716,'ZA');
 INSERT INTO Country(Code, Name, Continent, Region, SurfaceArea, IndepYear, Population, LifeExpectancy, GNP, GNPOld, LocalName, GovernmentForm, HeadOfState, Capital, Code2) VALUES ('ZMB','Zambia','Africa','Eastern Africa',752618.00,1964,9169000,37.2,3377.00,3922.00,'Zambia','Republic','Frederick Chiluba',3162,'ZM');
 INSERT INTO Country(Code, Name, Continent, Region, SurfaceArea, IndepYear, Population, LifeExpectancy, GNP, GNPOld, LocalName, GovernmentForm, HeadOfState, Capital, Code2) VALUES ('ZWE','Zimbabwe','Africa','Eastern Africa',390757.00,1980,11669000,37.8,5951.00,8670.00,'Zimbabwe','Republic','Robert G. Mugabe',4068,'ZW');
-
-SET STREAMING OFF;
