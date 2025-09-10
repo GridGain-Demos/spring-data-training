@@ -14,7 +14,6 @@ x-gridgain-def:
   environment:
     JVM_MAX_MEM: "4g"
     JVM_MIN_MEM: "4g"
-    BOOTSTRAP_NODE_CONFIG: /opt/gridgain/etc/gridgain-config.conf
   configs:
     - source: node_config
       target: /opt/gridgain/etc/gridgain-config.conf
