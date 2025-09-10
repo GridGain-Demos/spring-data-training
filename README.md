@@ -109,6 +109,11 @@ Leave the CLI connected to the cluster.
 
       <dependency>
         <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jdbc</artifactId>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
         <scope>test</scope>
       </dependency>
@@ -142,7 +147,7 @@ Leave the CLI connected to the cluster.
        spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
       ```
      
-  2. Edit the `StartupService.java` class. Autowire our connection to the Ignite servers:
+  2. Edit the `Application.java` class. Autowire our connection to the Ignite servers:
 
       ```java
       @Autowired

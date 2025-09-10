@@ -37,10 +37,6 @@
 			<artifactId>ignite-jdbc</artifactId>
 			<version>${ignite.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-jdbc</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
