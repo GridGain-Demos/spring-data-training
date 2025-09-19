@@ -286,3 +286,22 @@ In this section, we'll bring together the REST end-points supported by Spring Bo
       ```
 
   3.  Restart the `Application` and then test the controller method either in REST endpoint viewer: http://localhost:8080/api/mostPopulated?limit=5
+
+## Hands-on wrap-up
+
+When you have finished the exercises, you can shut down your cluster.
+
+1. Shut down the client application in your IDE
+2. Shut down your cluster with the following command if you're using Apache Ignite:
+
+      ```shell
+      docker compose -f docker-compose.yaml down
+      ```
+   
+   Or if you're using GridGain:
+
+      ```shell
+      docker compose -f docker-compose-gg9.yaml down
+      ```
+
+   The "down" command shuts down and deletes the containers. You can also use the "stop" command, which stops the cluster but keeps the containers, meaning that they can be restarted.
