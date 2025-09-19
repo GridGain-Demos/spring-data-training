@@ -131,7 +131,9 @@ Leave the CLI connected to the cluster.
       </dependency>
       ```
 
-  2. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
+  2. If you're using GridGain rather than Apache Ignite, update the `ignite.project` property to `org.gridgain` and the `ignite.version` to the correct version of GridGain, `9.1.8` for example
+
+  3. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
 
       ```properties
      org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=org.apache.ignite.data.IgniteDialectProvider
