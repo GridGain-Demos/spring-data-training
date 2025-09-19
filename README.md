@@ -196,9 +196,9 @@ Leave the CLI connected to the cluster.
       ```java
       @Test
       void countryRepositoryWorks() {
-		var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
-		System.out.println("count=" + results.size());
-		Assertions.assertTrue(results.size() > 0);
+        var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
+        System.out.println("count=" + results.size());
+        Assertions.assertTrue(results.size() > 0);
       }
       ```
       Add the following line after ApplicationTests class declaration:
@@ -208,9 +208,9 @@ Leave the CLI connected to the cluster.
      
   4. Run the tests:
 
-    ```shell
-    mvn compile test
-    ```
+      ```shell
+      mvn compile test
+      ```
 
 ### 7. Run Direct Queries With JOINs Via Ignite Repository
 
@@ -239,13 +239,13 @@ Leave the CLI connected to the cluster.
       ```java
       @Test
 	  void cityRepositoryWorks() {
-		  var city = cityRepository.findById(34);
-		  Assertions.assertTrue(city.isPresent());
+          var city = cityRepository.findById(34);
+          Assertions.assertTrue(city.isPresent());
           Assertions.assertEquals("Tirana", city.get().getName());
-
-		  var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
-		  Assertions.assertEquals(5, populatedCities.size());
-		  Assertions.assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
+   
+          var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
+          Assertions.assertEquals(5, populatedCities.size());
+          Assertions.assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
 	  }
       ```
    
@@ -256,9 +256,9 @@ Leave the CLI connected to the cluster.
    
   4. Run the tests:
 
-     ```shell
-     mvn compile test
-     ```
+      ```shell
+      mvn compile test
+      ```
 
 ## Hands-on part 4
 
