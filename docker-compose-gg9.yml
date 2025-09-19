@@ -10,7 +10,7 @@ name: spring-boot-data-training
 
 x-gridgain-def:
   &gridgain-def
-  image: gridgain/gridgain9:9.1.0
+  image: gridgain/gridgain9:9.1.8
   environment:
     JVM_MAX_MEM: "4g"
     JVM_MIN_MEM: "4g"

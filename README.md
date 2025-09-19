@@ -61,7 +61,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    Or GridGain 9:
 
     ```bash
-   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./gridgain-license.json:/opt/ignite/downloads/gridgain-license.json -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.0 cli
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./gridgain-license.json:/opt/ignite/downloads/gridgain-license.json -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.8 cli
    ```
    (Ensure your license file is in your current directory.)
 
