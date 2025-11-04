@@ -55,7 +55,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    a. Start the Command Line Interface (CLI).  Using Apache Ignite 3:
 
     ```bash
-   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.0.0 cli
+   docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.1.0 cli
    ```
 
    Or GridGain 9:
