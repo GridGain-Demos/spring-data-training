@@ -166,7 +166,7 @@ Leave the CLI connected to the cluster.
           log.info("Table names existing in cluster: {}", ignite.tables().tables().stream().map(Table::name).toList());
 
           log.info("Node information:");
-          for (var n : ignite.clusterNodes()) {
+          for (var n : ignite.cluster().nodes()) {
               log.info("ID: {}, Name: {}, Address: {}", n.id(), n.name(), n.address());
           }
       }
