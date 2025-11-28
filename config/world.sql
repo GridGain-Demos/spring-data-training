@@ -1,5 +1,3 @@
-ALTER ZONE "Default" SET replicas=2;
-
 DROP TABLE IF EXISTS Country;
 
 CREATE TABLE Country (
@@ -32,6 +30,8 @@ CREATE TABLE City (
 );
 
 CREATE INDEX idx_country_code ON city (CountryCode);
+
+ALTER ZONE "Default" SET replicas=2;
 
 INSERT INTO City(ID, Name, CountryCode, District, Population) VALUES (1,'Kabul','AFG','Kabol',1780000);
 INSERT INTO City(ID, Name, CountryCode, District, Population) VALUES (2,'Qandahar','AFG','Qandahar',237500);
