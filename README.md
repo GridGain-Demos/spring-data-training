@@ -2,7 +2,7 @@
 
 This project template is used throughout a
 [two-hour training session for Java developers and architects](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development)
-who want to explore the best practices and nuances of using Spring Boot and Spring Data with Apache Ignite.
+who want to explore the best practices and nuances of using [Spring Boot](https://spring.io/projects/spring-boot) and [Spring Data](https://spring.io/projects/spring-data) with [Apache Ignite](https://ignite.apache.org/) (or [GridGain](https://www.gridgain.com/tryfree)).
 During that instructor-led training, you build a RESTful web service that uses Apache Ignite as an in-memory database.
 The service is a Spring Boot application that interacts with the Ignite cluster via Spring Data repository abstractions.
 
@@ -11,8 +11,8 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 
 ## Setting Up Environment
 
-* GIT command line or GitHub Desktop (<https://desktop.github.com/>)
-* Docker Desktop
+* GIT command line or [GitHub Desktop](https://desktop.github.com/)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 * Java Developer Kit, version 17 or later
 * Apache Maven 3.6.x
 * Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
@@ -22,9 +22,13 @@ All the sessions are delivered by seasoned Ignite experts and committers.
   * [httpie](https://httpie.io)
   * A web browser
 
-**<u>Note</u>**  
+### Note 1
 
 This project has been tested most thoroughly using Java 17 and Ignite 3. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
+
+### Note 2
+
+This project currently uses Spring Boot and Data 3.x. Ignite and GridGain are expected to support Spring 4.x soon.
 
 ## Hands-on part 1
 
@@ -205,7 +209,6 @@ Leave the CLI connected to the cluster.
       ```
       Add the following line after ApplicationTests class declaration:
       ```java
-      @Autowired CountryRepository countryRepository;
       ```
      
   4. Run the tests:
