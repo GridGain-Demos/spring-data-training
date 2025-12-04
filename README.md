@@ -91,9 +91,7 @@ Leave the CLI connected to the cluster.
 
 ### 3. Load World Database
 
-1. Open a terminal window and navigate to the root directory of this project.
-
-2. Load the media store database by executing the SQL command to load the sample data.
+1. In the same CLI window, load the media store database by executing the SQL command to load the sample data.
 
    ```bash
    sql --file=/opt/ignite/downloads/world.sql
