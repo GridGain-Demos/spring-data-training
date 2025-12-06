@@ -207,6 +207,7 @@ Leave the CLI connected to the cluster.
       ```
       Add the following line after ApplicationTests class declaration:
       ```java
+      @Autowired CountryRepository countryRepository;
       ```
      
   4. Run the tests:
