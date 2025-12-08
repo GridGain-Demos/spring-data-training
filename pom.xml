@@ -37,6 +37,33 @@
 			<artifactId>ignite-jdbc</artifactId>
 			<version>${ignite.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${ignite.project}</groupId>
+			<artifactId>spring-data-ignite</artifactId>
+			<version>${ignite.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${ignite.project}</groupId>
+			<artifactId>spring-boot-starter-ignite-client</artifactId>
+			<version>${ignite.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

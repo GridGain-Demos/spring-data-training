@@ -1,311 +1,102 @@
-# Project Template for Apache Ignite With Spring Boot and Spring Data Training
+# Spring Boot and Spring Data with Apache Ignite
 
-This project template is used throughout a
-[two-hour training session for Java developers and architects](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development)
-who want to explore the best practices and nuances of using [Spring Boot](https://spring.io/projects/spring-boot) and [Spring Data](https://spring.io/projects/spring-data) with [Apache Ignite](https://ignite.apache.org/) (or [GridGain](https://www.gridgain.com/tryfree)).
-During that instructor-led training, you build a RESTful web service that uses Apache Ignite as an in-memory database.
-The service is a Spring Boot application that interacts with the Ignite cluster via Spring Data repository abstractions.
+A hands-on training project for integrating Spring Boot and Spring Data with Apache Ignite 3 (or GridGain 9). Build a RESTful web service backed by a distributed in-memory database.
 
-Check [the schedule a join one of our upcoming sessions](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development).
-All the sessions are delivered by seasoned Ignite experts and committers.
+## About This Project
 
-## Setting Up Environment
+This repository supports a [two-hour instructor-led training session](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development) for Java developers and architects. The training is also designed for self-paced learning.
 
-* GIT command line or [GitHub Desktop](https://desktop.github.com/)
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* Java Developer Kit, version 17 or later
-* Apache Maven 3.6.x
-* Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
-* Tool to query a REST endpoint such as:
-  * [Postman REST tool](https://www.postman.com/)
-  * [curl](https://curl.se/)
-  * [httpie](https://httpie.io)
-  * A web browser
+**What you'll build**: A Spring Boot application that queries a distributed database through Spring Data repositories. The application demonstrates query derivation, custom SQL with JOINs, and REST endpoint exposure.
 
-### Note 1
-
-This project has been tested most thoroughly using Java 17 and Ignite 3. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
-
-### Note 2
-
-This project currently uses Spring Boot and Data 3.x. Ignite and GridGain are expected to support Spring 4.x soon.
-
-## Hands-on part 1
-
-### 1. Clone the Project
-
-Open a terminal window and clone the project to your dev environment:
+## Quick Start
 
 ```bash
+# Clone the repository
 git clone https://github.com/GridGain-Demos/spring-data-training.git
+cd spring-data-training
+
+# Start the Ignite cluster
+docker compose -f docker-compose.yml up -d
+
+# Initialize the cluster (in the Ignite CLI)
+docker run -v ./config/world.sql:/opt/ignite/downloads/world.sql \
+  --rm --network spring-boot-data-training_default \
+  -it apacheignite/ignite:3.1.0 cli
+
+# Then run these commands in the CLI:
+# connect http://node1:10300
+# cluster init --name=spring-data-training --metastorage-group=node1,node2
+# sql --file=/opt/ignite/downloads/world.sql
 ```
 
-### 2. Start your Apache Ignite cluster
+See the [Training Overview](docs/training-overview.md) for complete instructions.
 
-1. Start your nodes using Docker Compose. Using Apache Ignite 3:
+## Prerequisites
 
-    ```bash
-    docker compose -f docker-compose.yml up -d
-    ```
+- Java 17 or later
+- Maven 3.6+
+- Docker Desktop
+- An IDE (IntelliJ IDEA, VS Code, etc.)
 
-    Or GridGain 9:
+## Documentation
 
-    ```bash
-    docker compose -f docker-compose-gg9.yml up -d
-    ```
+### Training Modules
 
-2. Initialize your cluster:
+Work through these modules in order:
 
-   a. Start the Command Line Interface (CLI).  Using Apache Ignite 3:
+1. [Cluster Setup](docs/01-cluster-setup.md) - Start the Ignite cluster and load sample data
+2. [Spring Boot Configuration](docs/02-spring-boot-config.md) - Configure dependencies and connections
+3. [Building Repositories](docs/03-repositories.md) - Create Spring Data repositories
+4. [REST API](docs/04-rest-api.md) - Expose data through HTTP endpoints
 
-    ```bash
-   docker run -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.1.0 cli
-   ```
+### Reference
 
-   Or GridGain 9:
+- [Architecture Guide](docs/reference/architecture.md) - How the application components fit together
+- [Training Overview](docs/training-overview.md) - Prerequisites, structure, and learning objectives
 
-    ```bash
-   docker run -v ./gridgain-license.json:/opt/ignite/downloads/gridgain-license.json -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.8 cli
-   ```
-   (Ensure your license file is in your current directory.)
+## Project Structure
 
-   b. Connect to the cluster.
+```
+├── docs/                     Training modules and reference documentation
+├── config/
+│   └── world.sql            Sample data (countries and cities)
+├── src/main/java/.../
+│   ├── Application.java     Spring Boot entry point
+│   ├── model/               Entity classes (City, Country)
+│   ├── *Repository.java     Spring Data repositories
+│   └── *Controller.java     REST endpoints
+└── docker-compose.yml       Three-node Ignite cluster
+```
 
-   ```bash
-   connect http://node1:10300
-   ```
+## Technology Stack
 
-   c. Execute command to initialize the cluster. Using Apache Ignite 3:
+| Component | Version |
+|-----------|---------|
+| Apache Ignite | 3.1.0 |
+| Spring Boot | 3.x |
+| Spring Data JDBC | 3.x |
+| Java | 17+ |
 
-   ```bash
-   cluster init --name=spring-data-training --metastorage-group=node1,node2
-   ```
+For GridGain 9, update the Maven properties as described in the training modules.
 
-   Or GridGain 9:
+## Running Tests
 
-   ```bash
-   cluster init --name=spring-data-training --metastorage-group=node1,node2 --license=/opt/ignite/downloads/gridgain-license.json
-   ```
+With the cluster running:
 
-Leave the CLI connected to the cluster.
+```bash
+mvn compile test
+```
 
-### 3. Load World Database
+## Shutting Down
 
-1. In the same CLI window, load the media store database by executing the SQL command to load the sample data.
+```bash
+docker compose -f docker-compose.yml down
+```
 
-   ```bash
-   sql --file=/opt/ignite/downloads/world.sql
-    ```
+## Issues and Feedback
 
-## Hands-on part 2 
+If you find issues or have suggestions, please open an Issue or PR on this repository. For training-related questions, contact [GridGain Training](https://www.gridgain.com/products/services/training).
 
-### 4. Configure Ignite Spring Boot and Data Extensions
+## License
 
-  1. Enable Ignite Spring Boot and Spring Data extensions by adding the following artifacts to the `pom.xml` file
-
-      ```xml
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jdbc</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>${ignite.project}</groupId>
-         <artifactId>spring-data-ignite</artifactId>
-         <version>${ignite.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>${ignite.project}</groupId>
-         <artifactId>spring-boot-starter-ignite-client</artifactId>
-         <version>${ignite.version}</version>
-      </dependency>
-      ```
-
-  2. If you're using GridGain rather than Apache Ignite, update the `ignite.project` property to `org.gridgain` and the `ignite.version` to the correct version of GridGain, `9.1.8` for example
-
-  3. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
-
-      ```properties
-     org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=org.apache.ignite.data.IgniteDialectProvider
-     ```
-
-### 5. Configure Spring Boot to connect to Ignite
-
-  1. Update the `application.properties` by adding an option that tells Spring Boot where to find the Ignite server node:
-
-      ```properties
-       ignite.client.addresses=127.0.0.1:10800
-       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
-       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
-      ```
-     
-  2. Edit the `Application.java` class. Autowire our connection to the Ignite servers:
-
-      ```java
-      @Autowired
-      private Ignite ignite;
-      ```
-
-  3. Add some diagnostics code to run when the server starts:
-
-      ```java
-      private Logger log = LoggerFactory.getLogger(Application.class);
-
-      @EventListener(ApplicationReadyEvent.class)
-      public void startupLogger() {
-          log.info("Table names existing in cluster: {}", ignite.tables().tables().stream().map(Table::name).toList());
-
-          log.info("Node information:");
-          for (var n : ignite.cluster().nodes()) {
-              log.info("ID: {}, Name: {}, Address: {}", n.id(), n.name(), n.address());
-          }
-      }
-      ```
-
-  4. Run your new Spring Boot application. It should connect to your Ignite servers and list information about the tables and cluster topology
-
-## Hand-on part 3
-
-### 6. Run Simple Auto-Generated Queries Via Ignite Repository
-
-  1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
-
-      ```java
-      @Repository
-      public interface CountryRepository extends CrudRepository<Country, String> {
-
-      }
-      ```
-
-  2. Add a method that returns countries with a population bigger than provided one:
-
-      ```java
-      List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
-      ```
-
-  3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
-
-      ```java
-      @Test
-      void countryRepositoryWorks() {
-        var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
-        System.out.println("count=" + results.size());
-        Assertions.assertTrue(results.size() > 0);
-      }
-      ```
-      Add the following line after ApplicationTests class declaration:
-      ```java
-      @Autowired CountryRepository countryRepository;
-      ```
-     
-  4. Run the tests:
-
-      ```shell
-      mvn compile test
-      ```
-
-### 7. Run Direct Queries With JOINs Via Ignite Repository
-
-  1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
-
-      ```java
-      @Repository
-      public interface CityRepository extends CrudRepository<City, Integer> {
-      }
-      ```
-
-  2. Add a direct SQL query that joins two tables:
-
-      ```java
-      record PopulousCity(String cityName, Integer population, String countryName) {}
-
-      @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
-            "JOIN city ON city.countrycode = country.code " +
-            "GROUP BY city.name, country.name, city.population " +
-            "ORDER BY city.population DESC LIMIT :limit")
-      public List<PopulousCity> findTopXMostPopulatedCities(int limit);
-      ```
-
-3. Create a test in ApplicationTests to validate the methods respond properly:
-
-      ```java
-      @Test
-	  void cityRepositoryWorks() {
-          var city = cityRepository.findById(34);
-          Assertions.assertTrue(city.isPresent());
-          Assertions.assertEquals("Tirana", city.get().getName());
-   
-          var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
-          Assertions.assertEquals(5, populatedCities.size());
-          Assertions.assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
-	  }
-      ```
-   
-      Add the following line after ApplicationTests class declaration:
-      ```java
-      @Autowired CityRepository cityRepository;
-      ```
-   
-  4. Run the tests:
-
-      ```shell
-      mvn compile test
-      ```
-
-## Hands-on part 4
-
-### 8. Create Spring REST Controller
-
-In this section, we'll bring together the REST end-points supported by Spring Boot and the database access provided by Spring Data. By starting Ignite and loading the data (as mentioned in the above steps), this code can be directly used for the REST APIs. 
-
-  1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
-
-      ```java
-      @RestController
-      public class WorldDatabaseController {
-          @Autowired CityRepository cityRepository;
-
-      }
-      ```
-
-  2. Add a method that returns top X most populated cities:
-
-      ```java
-      @GetMapping("/api/mostPopulated")
-      public List<CityRepository.PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
-          return cityRepository.findTopXMostPopulatedCities(limit);
-      }
-      ```
-
-  3.  Restart the `Application` and then test the controller method either in REST endpoint viewer: http://localhost:8080/api/mostPopulated?limit=5
-
-## Hands-on wrap-up
-
-When you have finished the exercises, you can shut down your cluster.
-
-1. Shut down the client application in your IDE
-2. Shut down your cluster with the following command if you're using Apache Ignite:
-
-      ```shell
-      docker compose -f docker-compose.yaml down
-      ```
-   
-   Or if you're using GridGain:
-
-      ```shell
-      docker compose -f docker-compose-gg9.yaml down
-      ```
-
-   The "down" command shuts down and deletes the containers. You can also use the "stop" command, which stops the cluster but keeps the containers, meaning that they can be restarted.
+This project is provided for educational purposes as part of GridGain's training program.

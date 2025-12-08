@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "ignite.client.addresses",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of Ignite thin client addresses in host:port format. Used by spring-boot-starter-ignite-client for auto-configuration."
+    }
+  ]
+}
