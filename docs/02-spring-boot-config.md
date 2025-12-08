@@ -165,6 +165,162 @@ The `@EnableJdbcRepositories` annotation activates Spring Data JDBC repository s
 
 Run the application. You should see output showing the COUNTRY and CITY tables and the three cluster nodes. If you see connection errors, make sure your Docker containers are still running.
 
+## Understanding Entity Classes
+
+Now that you've confirmed the schema exists, let's look at how Java classes map to those tables. This is a key concept for working with Ignite 3 and Spring Data.
+
+### Schema-First Development
+
+Ignite 3 follows a **schema-first** approach. You define tables using SQL DDL, and then create Java classes that map to those tables. This is different from ORM frameworks like Hibernate, where you might define entities first and generate the schema from them.
+
+The World Database schema was created in Module 1 when you ran `world.sql`. Here's what those table definitions look like:
+
+```sql
+CREATE TABLE Country (
+  Code VARCHAR(3) PRIMARY KEY,
+  Name VARCHAR,
+  Continent VARCHAR,
+  Region VARCHAR,
+  SurfaceArea DECIMAL(10,2),
+  IndepYear SMALLINT,
+  Population INT,
+  LifeExpectancy DECIMAL(3,1),
+  GNP DECIMAL(10,2),
+  GNPOld DECIMAL(10,2),
+  LocalName VARCHAR,
+  GovernmentForm VARCHAR,
+  HeadOfState VARCHAR,
+  Capital INT,
+  Code2 VARCHAR(2)
+);
+
+CREATE TABLE City (
+  ID INT,
+  Name VARCHAR,
+  CountryCode VARCHAR(3),
+  District VARCHAR,
+  Population INT,
+  PRIMARY KEY (ID)
+);
+
+CREATE INDEX idx_country_code ON city (CountryCode);
+```
+
+The schema defines two tables with their column types, primary keys, and an index for JOIN performance. Your Java classes need to match this structure.
+
+### SQL to Java Type Mapping
+
+When translating SQL columns to Java fields, use these type mappings:
+
+| SQL Type       | Java Type                    | Notes                                         |
+|----------------|------------------------------|-----------------------------------------------|
+| `VARCHAR`      | `String`                     |                                               |
+| `INT`          | `Integer`                    | Use wrapper type to allow null                |
+| `SMALLINT`     | `Short`                      |                                               |
+| `DECIMAL(p,s)` | `BigDecimal`                 | Preserves precision for currency/measurements |
+| `BOOLEAN`      | `Boolean`                    |                                               |
+| `DATE`         | `LocalDate`                  |                                               |
+| `TIMESTAMP`    | `Instant` or `LocalDateTime` |                                               |
+
+For columns that might be NULL, use wrapper types (`Integer`, `Short`) rather than primitives (`int`, `short`). Primitives can't represent null values.
+
+### Spring Data JDBC Annotations
+
+Spring Data JDBC uses annotations to map Java classes to database tables. The template includes two entity classes in `src/main/java/com/gridgain/training/spring/model/`. Let's examine how they're built.
+
+**The City entity** maps to the CITY table:
+
+```java
+package com.gridgain.training.spring.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+
+public class City {
+    @Id
+    private Integer id;
+
+    @Column(value = "COUNTRYCODE")
+    private String countryCode;
+
+    private String name;
+    private String district;
+    private Integer population;
+
+    // Constructors, getters, setters, toString...
+}
+```
+
+Key points:
+
+- **`@Id`** marks the primary key field. Spring Data uses this for `findById()`, `deleteById()`, and to determine insert vs. update behavior.
+
+- **`@Column`** maps a Java field to a SQL column when names don't match. The field `countryCode` (camelCase) needs to map to column `COUNTRYCODE` (no underscore). Without this annotation, Spring Data would look for a column named `COUNTRY_CODE`.
+
+- **Fields without annotations** map by convention. The field `name` maps to column `NAME`, `district` to `DISTRICT`, and so on. Spring Data's convention is case-insensitive.
+
+**The Country entity** demonstrates additional patterns:
+
+```java
+public class Country {
+    @Id
+    private String code;          // VARCHAR(3) -> String, natural key
+
+    private String name;
+    private String continent;
+    private String region;
+    private Integer population;   // INT -> Integer (nullable)
+
+    @Column(value = "SURFACEAREA")
+    private BigDecimal surfaceArea;   // DECIMAL(10,2) -> BigDecimal
+
+    @Column("INDEPYEAR")
+    private Short indepYear;          // SMALLINT -> Short
+
+    @Column(value = "LIFEEXPECTANCY")
+    private BigDecimal lifeExpectancy;
+
+    // ... additional fields with @Column where needed
+}
+```
+
+The Country entity shows:
+
+- **Natural keys**: The primary key is `code` (a 3-letter country code like "USA"), not an auto-generated integer.
+
+- **BigDecimal for precision**: Financial and measurement data uses `BigDecimal` to avoid floating-point rounding errors.
+
+- **Multiple @Column annotations**: Any field with a camelCase name that differs from the SQL column name needs explicit mapping.
+
+### What About Relationships?
+
+You might notice that `City.countryCode` references `Country.code`, but there's no `@ManyToOne` or relationship annotation. Spring Data JDBC doesn't automatically resolve foreign key relationships like JPA does.
+
+This is intentional. Spring Data JDBC favors explicit queries over implicit lazy loading. When you need data from both tables, write a JOIN query (you'll do this in Module 3). This approach is more predictable and works well with Ignite's distributed SQL engine.
+
+### Ignite 3 Native Annotations
+
+For completeness, Ignite 3 also provides its own annotation API in `org.apache.ignite.catalog.annotations`. These annotations serve a different purpose: **schema creation from code**.
+
+```java
+// Ignite 3 native annotations (for schema creation)
+@Table(value = "my_table", zone = @Zone(value = "my_zone", replicas = 2))
+class MyEntity {
+    @Id
+    Integer id;
+
+    @Column(value = "full_name", length = 100)
+    String name;
+}
+
+// Create the table from the annotated class
+ignite.catalog().createTable(MyEntity.class);
+```
+
+The Ignite annotations include features like distribution zones, colocation, and indexes that are specific to distributed systems. However, for this training we use the schema-first approach: the tables already exist, and we use Spring Data annotations to map to them.
+
+Both approaches are valid. Schema-first gives DBAs control over table design. Code-first with Ignite annotations works well when developers own the schema. Choose based on your team's workflow.
+
 ## What You've Done
 
 Your Spring Boot application now:
@@ -173,6 +329,13 @@ Your Spring Boot application now:
 - Knows how to generate Ignite-compatible SQL
 - Can connect via both the native thin client and JDBC
 - Logs cluster information on startup to verify connectivity
+
+You also understand:
+
+- How Ignite 3's schema-first approach works
+- How to map SQL types to Java types
+- How Spring Data JDBC annotations connect Java classes to database tables
+- Why the template's entity classes are structured the way they are
 
 ## Next Module
 
