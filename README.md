@@ -1,72 +1,66 @@
 # Spring Boot and Spring Data with Apache Ignite
 
-A hands-on training project for integrating Spring Boot and Spring Data with Apache Ignite 3 (or GridGain 9). Build a RESTful web service backed by a distributed in-memory database.
+A hands-on training template for integrating Spring Boot and Spring Data with Apache Ignite 3 (or GridGain 9). Build a RESTful web service backed by a distributed in-memory database.
 
 ## About This Project
 
-This repository supports a [two-hour instructor-led training session](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development) for Java developers and architects. The training is also designed for self-paced learning.
+This repository is a **project template** that supports a [two-hour instructor-led training session](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development) for Java developers and architects. You start with a minimal Spring Boot application and build it up by following the training modules.
 
 **What you'll build**: A Spring Boot application that queries a distributed database through Spring Data repositories. The application demonstrates query derivation, custom SQL with JOINs, and REST endpoint exposure.
 
-## Quick Start
-
-```bash
-# Clone the repository
-git clone https://github.com/GridGain-Demos/spring-data-training.git
-cd spring-data-training
-
-# Start the Ignite cluster
-docker compose -f docker-compose.yml up -d
-
-# Initialize the cluster (in the Ignite CLI)
-docker run -v ./config/world.sql:/opt/ignite/downloads/world.sql \
-  --rm --network spring-boot-data-training_default \
-  -it apacheignite/ignite:3.1.0 cli
-
-# Then run these commands in the CLI:
-# connect http://node1:10300
-# cluster init --name=spring-data-training --metastorage-group=node1,node2
-# sql --file=/opt/ignite/downloads/world.sql
-```
-
-See the [Training Overview](docs/training-overview.md) for complete instructions.
+**How it works**: The template provides entity classes and Docker configuration. You add the Spring Data dependencies, configuration files, repositories, and controllers by following step-by-step instructions in the documentation.
 
 ## Prerequisites
 
-- Java 17 or later
-- Maven 3.6+
-- Docker Desktop
-- An IDE (IntelliJ IDEA, VS Code, etc.)
+Before starting, make sure you have:
 
-## Documentation
+- **Java 17 or later** (Spring Boot 3.x requires Java 17)
+- **Maven 3.6+**
+- **Docker Desktop**
+- **An IDE** (IntelliJ IDEA, VS Code, etc.)
+- **A REST client** (browser, curl, httpie, or Postman)
 
-### Training Modules
+## Getting Started
+
+Start with [Module 1: Cluster Setup](docs/01-cluster-setup.md), which walks you through cloning the repository, starting the Ignite cluster, and loading sample data.
+
+## Training Modules
 
 Work through these modules in order:
 
-1. [Cluster Setup](docs/01-cluster-setup.md) - Start the Ignite cluster and load sample data
-2. [Spring Boot Configuration](docs/02-spring-boot-config.md) - Configure dependencies and connections
-3. [Building Repositories](docs/03-repositories.md) - Create Spring Data repositories
-4. [REST API](docs/04-rest-api.md) - Expose data through HTTP endpoints
+| Module | What You'll Do |
+|--------|----------------|
+| [1. Cluster Setup](docs/01-cluster-setup.md) | Start a three-node Ignite cluster with Docker and load sample data |
+| [2. Spring Boot Configuration](docs/02-spring-boot-config.md) | Add dependencies, configure connections, verify connectivity |
+| [3. Building Repositories](docs/03-repositories.md) | Create Spring Data repositories with query derivation and custom SQL |
+| [4. REST API](docs/04-rest-api.md) | Expose your data through REST endpoints |
 
-### Reference
-
-- [Architecture Guide](docs/reference/architecture.md) - How the application components fit together
-- [Training Overview](docs/training-overview.md) - Prerequisites, structure, and learning objectives
+Each module takes roughly 20-30 minutes, depending on your familiarity with the technologies involved.
 
 ## Project Structure
 
+The template provides the foundation. You build on it during the training.
+
 ```
-├── docs/                     Training modules and reference documentation
+├── docs/                     Training modules (your guide)
 ├── config/
 │   └── world.sql            Sample data (countries and cities)
 ├── src/main/java/.../
-│   ├── Application.java     Spring Boot entry point
-│   ├── model/               Entity classes (City, Country)
-│   ├── *Repository.java     Spring Data repositories
-│   └── *Controller.java     REST endpoints
+│   ├── Application.java     Spring Boot entry point (you'll modify this)
+│   └── model/
+│       ├── City.java        Entity class (provided)
+│       └── Country.java     Entity class (provided)
+├── src/test/java/.../
+│   └── ApplicationTests.java  Test class (you'll add tests here)
+├── pom.xml                  Maven config (you'll add dependencies)
 └── docker-compose.yml       Three-node Ignite cluster
 ```
+
+**Files you'll create during the training:**
+- `CountryRepository.java` - Spring Data repository with derived queries
+- `CityRepository.java` - Spring Data repository with custom SQL
+- `WorldDatabaseController.java` - REST controller
+- `META-INF/spring.factories` - SQL dialect configuration
 
 ## Technology Stack
 
@@ -79,9 +73,14 @@ Work through these modules in order:
 
 For GridGain 9, update the Maven properties as described in the training modules.
 
+## Reference Material
+
+- [Training Overview](docs/training-overview.md) - Learning objectives and prerequisites
+- [Architecture Guide](docs/reference/architecture.md) - How the completed application components fit together
+
 ## Running Tests
 
-With the cluster running:
+After completing the training modules, with the cluster running:
 
 ```bash
 mvn compile test

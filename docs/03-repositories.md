@@ -51,9 +51,28 @@ You could use Ignite's native APIs directly for all your data access. But Spring
 
 ## Step 9: Create CountryRepository
 
-Create a new interface `CountryRepository.java` in the `com.gridgain.training.spring` package:
+Create a new file `CountryRepository.java` in the `com.gridgain.training.spring` package:
 
 ```java
+package com.gridgain.training.spring;
+
+import com.gridgain.training.spring.model.Country;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * Spring Data repository for Country entities.
+ *
+ * Extending CrudRepository provides standard CRUD operations (save, findById, findAll, delete)
+ * without writing any implementation code. Spring Data generates the implementation at runtime
+ * based on the entity type (Country) and primary key type (String).
+ *
+ * The repository uses the JDBC connection configured in application.properties, with SQL dialect
+ * support provided by IgniteDialectProvider. All generated queries execute against the Ignite
+ * cluster's distributed SQL engine.
+ */
 @Repository
 public interface CountryRepository extends CrudRepository<Country, String> {
 
@@ -64,10 +83,25 @@ That's it. You now have `findById()`, `findAll()`, `save()`, and `delete()` oper
 
 ## Step 10: Add a Derived Query
 
-Add a method to find countries by population:
+Add a method to find countries by population. Add this method inside the `CountryRepository` interface:
 
 ```java
-List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
+    /**
+     * Query derivation example: Spring Data parses this method name and generates SQL automatically.
+     *
+     * Method name breakdown:
+     * - findBy: SELECT query prefix
+     * - Population: WHERE clause on the population column
+     * - GreaterThan: comparison operator (>)
+     * - OrderByPopulationDesc: ORDER BY population DESC
+     *
+     * Generated SQL equivalent:
+     * SELECT * FROM country WHERE population > ? ORDER BY population DESC
+     *
+     * This pattern eliminates boilerplate SQL for common query patterns. For more complex queries
+     * involving JOINs or aggregations, use the @Query annotation instead.
+     */
+    List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
 ```
 
 Spring Data parses this method name and generates the corresponding SQL. No implementation needed.
@@ -109,18 +143,33 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 ```
 
-Then add the repository field and test method:
+Also add these imports:
 
 ```java
-@Autowired
-CountryRepository countryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+```
 
-@Test
-void countryRepositoryWorks() {
-    var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
-    log.info("count={}", results.size());
-    assertFalse(results.isEmpty());
-}
+Then add the logger, repository field, and test method inside the class:
+
+```java
+    private static final Logger log = LoggerFactory.getLogger(ApplicationTests.class);
+
+    @Autowired
+    CountryRepository countryRepository;
+
+    /**
+     * Tests query derivation: Spring Data generates SQL from the method name.
+     * findByPopulationGreaterThanOrderByPopulationDesc(100_000_000) should return
+     * countries with population over 100 million, ordered by population descending.
+     */
+    @Test
+    void countryRepositoryWorks() {
+        var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
+        log.info("count={}", results.size());
+        assertFalse(results.isEmpty());
+    }
 ```
 
 Note: `assertFalse(results.isEmpty())` is cleaner than `assertTrue(results.size() > 0)`. It reads naturally and produces a clearer failure message.
@@ -191,10 +240,6 @@ try (ResultSet<SqlRow> rs = ignite.sql().execute(null, stmt, 34)) {
 
 Use SQL when you need JOINs, aggregations, complex filtering, or when you prefer declarative queries over imperative code.
 
-### Working Example
-
-The `Application.java` file includes a `demonstrateDataAccessApis()` method that shows all three APIs working with the CITY table. Run the application and check the logs to see each API in action.
-
 ### Why This Training Uses Spring Data
 
 Spring Data repositories use SQL under the hood, but they generate it for you based on method names or `@Query` annotations. This approach offers:
@@ -207,19 +252,62 @@ For production applications, choose the API that fits your use case. RecordView 
 
 ## Step 12: Create CityRepository with Custom SQL
 
-Query derivation works great for simple queries, but JOINs need actual SQL. Create `CityRepository.java`:
+Query derivation works great for simple queries, but JOINs need actual SQL. Create a new file `CityRepository.java`:
 
 ```java
+package com.gridgain.training.spring;
+
+import com.gridgain.training.spring.model.City;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * Spring Data repository for City entities demonstrating custom SQL queries.
+ *
+ * While CrudRepository provides basic operations and query derivation handles simple WHERE clauses,
+ * complex queries involving JOINs, aggregations, or specific SQL syntax require the @Query annotation.
+ *
+ * This repository shows both patterns:
+ * - Inherited methods (findById, findAll, save, delete) from CrudRepository
+ * - Custom SQL via @Query for multi-table operations
+ */
 @Repository
 public interface CityRepository extends CrudRepository<City, Integer> {
 
+    /**
+     * DTO record for query results that span multiple tables.
+     *
+     * When a query returns columns from different tables or computed values, define a record
+     * (or class) to hold the results. Spring Data maps query result columns to record components
+     * by matching column aliases to component names (city_name -> cityName via convention).
+     *
+     * Records provide immutability and automatic equals/hashCode/toString implementations,
+     * making them ideal for DTOs in Spring Data projections.
+     */
     record PopulousCity(String cityName, Integer population, String countryName) {}
 
-    @Query("SELECT city.name as city_name, MAX(city.population) as population, " +
-           "country.name as country_name FROM country " +
-           "JOIN city ON city.countrycode = country.code " +
-           "GROUP BY city.name, country.name, city.population " +
-           "ORDER BY city.population DESC LIMIT :limit")
+    /**
+     * Custom SQL query demonstrating JOIN operations with Ignite's distributed SQL engine.
+     *
+     * Query features:
+     * - JOIN between city and country tables on the foreign key relationship
+     * - Aggregation (MAX) with GROUP BY
+     * - Result ordering and limiting
+     * - Named parameter binding (:limit)
+     *
+     * Column aliasing (city.name AS city_name) ensures results map correctly to the PopulousCity
+     * record components. The underscore-to-camelCase conversion is handled automatically.
+     *
+     * Ignite executes this query across the distributed cluster, with each node processing
+     * its local data partition before aggregating results.
+     */
+    @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
+            "JOIN city ON city.countrycode = country.code " +
+            "GROUP BY city.name, country.name, city.population " +
+            "ORDER BY city.population DESC LIMIT :limit")
     public List<PopulousCity> findTopXMostPopulatedCities(int limit);
 }
 ```
@@ -246,26 +334,36 @@ The `:limit` syntax creates a named parameter. Spring Data binds the method argu
 
 ## Step 13: Test the Join Query
 
-Add another test:
+Add another test. First, add the repository field to `ApplicationTests.java`:
 
 ```java
-@Autowired
-CityRepository cityRepository;
+    @Autowired
+    CityRepository cityRepository;
+```
 
-@Test
-void cityRepositoryWorks() {
-    // Test inherited CrudRepository.findById()
-    var city = cityRepository.findById(34);
-    log.info("city={}", city.orElse(null));
-    assertTrue(city.isPresent());
-    assertEquals("Tirana", city.get().getName());
+Then add the test method:
 
-    // Test custom @Query with JOIN, GROUP BY, ORDER BY, LIMIT
-    var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
-    log.info("top 5 cities={}", populatedCities);
-    assertEquals(5, populatedCities.size());
-    assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
-}
+```java
+    /**
+     * Tests both inherited CrudRepository methods and custom @Query operations.
+     *
+     * findById(34) exercises the inherited method with ID-based lookup.
+     * findTopXMostPopulatedCities(5) exercises the custom JOIN query.
+     */
+    @Test
+    void cityRepositoryWorks() {
+        // Test inherited CrudRepository.findById()
+        var city = cityRepository.findById(34);
+        log.info("city={}", city.orElse(null));
+        assertTrue(city.isPresent());
+        assertEquals("Tirana", city.get().getName());
+
+        // Test custom @Query with JOIN, GROUP BY, ORDER BY, LIMIT
+        var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
+        log.info("top 5 cities={}", populatedCities);
+        assertEquals(5, populatedCities.size());
+        assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
+    }
 ```
 
 The comments clarify which repository feature each section exercises. Run the tests again. Mumbai should come out on top.
