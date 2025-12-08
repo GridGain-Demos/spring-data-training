@@ -5,6 +5,27 @@ import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
 
+/**
+ * Entity class mapped to the COUNTRY table in the Ignite cluster.
+ *
+ * This class demonstrates several Spring Data JDBC mapping patterns:
+ *
+ * Primary Key: The {@code @Id} annotation on the code field marks it as the table's primary key.
+ * Unlike auto-increment integer keys, this uses a natural key (3-letter country code).
+ *
+ * Column Mapping: Fields with names matching SQL columns (case-insensitive) need no annotation.
+ * Fields with different naming conventions require {@code @Column} to specify the exact match.
+ *
+ * Type Mapping: Ignite SQL types map to Java types as follows:
+ * - VARCHAR -> String
+ * - INT -> Integer
+ * - SMALLINT -> Short
+ * - DECIMAL -> BigDecimal
+ *
+ * The capital field references a City.id but is not modeled as a relationship.
+ * Spring Data JDBC requires explicit aggregate design; cross-table references
+ * are typically resolved via separate repository queries or JOIN statements.
+ */
 public class Country {
     @Id
     private String code;
@@ -17,6 +38,7 @@ public class Country {
 
     private Integer population;
 
+    // Column annotations map camelCase Java fields to SQL column names
     @Column(value = "SURFACEAREA")
     private BigDecimal surfaceArea;
 

@@ -37,6 +37,9 @@
 			<artifactId>ignite-jdbc</artifactId>
 			<version>${ignite.version}</version>
 		</dependency>
+
+		<!-- Add Spring dependencies here during the training -->
+
 	</dependencies>
 
 	<build>

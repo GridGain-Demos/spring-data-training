@@ -38,12 +38,12 @@ services:
     ports:
       - 10301:10300
       - 10801:10800
-#  node3:
-#    << : *ignite-def
-#    command: --node-name node3
-#    ports:
-#      - 10302:10300
-#      - 10802:10800
+  node3:
+    << : *ignite-def
+    command: --node-name node3
+    ports:
+      - 10302:10300
+      - 10802:10800
 
 configs:
   node_config:
