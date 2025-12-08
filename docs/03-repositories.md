@@ -110,18 +110,18 @@ Spring Data parses this method name and generates the corresponding SQL. No impl
 
 Spring Data breaks the method name into keywords and builds a query:
 
-| Keyword | SQL Equivalent | Example |
-|---------|---------------|---------|
-| `findBy` | `SELECT ... WHERE` | `findByName` |
-| `And` | `AND` | `findByNameAndRegion` |
-| `Or` | `OR` | `findByNameOrCode` |
-| `GreaterThan` | `>` | `findByPopulationGreaterThan` |
-| `LessThan` | `<` | `findByPopulationLessThan` |
-| `Between` | `BETWEEN` | `findByPopulationBetween` |
-| `Like` | `LIKE` | `findByNameLike` |
-| `IsNull` | `IS NULL` | `findByCapitalIsNull` |
-| `OrderBy...Asc/Desc` | `ORDER BY ... ASC/DESC` | `findByRegionOrderByNameAsc` |
-| `First` / `Top` | `LIMIT` | `findFirstByOrderByPopulationDesc` |
+| Keyword              | SQL Equivalent          | Example                            |
+|----------------------|-------------------------|------------------------------------|
+| `findBy`             | `SELECT ... WHERE`      | `findByName`                       |
+| `And`                | `AND`                   | `findByNameAndRegion`              |
+| `Or`                 | `OR`                    | `findByNameOrCode`                 |
+| `GreaterThan`        | `>`                     | `findByPopulationGreaterThan`      |
+| `LessThan`           | `<`                     | `findByPopulationLessThan`         |
+| `Between`            | `BETWEEN`               | `findByPopulationBetween`          |
+| `Like`               | `LIKE`                  | `findByNameLike`                   |
+| `IsNull`             | `IS NULL`               | `findByCapitalIsNull`              |
+| `OrderBy...Asc/Desc` | `ORDER BY ... ASC/DESC` | `findByRegionOrderByNameAsc`       |
+| `First` / `Top`      | `LIMIT`                 | `findFirstByOrderByPopulationDesc` |
 
 So `findByPopulationGreaterThanOrderByPopulationDesc(int population)` becomes:
 

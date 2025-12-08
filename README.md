@@ -28,12 +28,12 @@ Start with [Module 1: Cluster Setup](docs/01-cluster-setup.md), which walks you 
 
 Work through these modules in order:
 
-| Module | What You'll Do |
-|--------|----------------|
-| [1. Cluster Setup](docs/01-cluster-setup.md) | Start a three-node Ignite cluster with Docker and load sample data |
-| [2. Spring Boot Configuration](docs/02-spring-boot-config.md) | Add dependencies, configure connections, verify connectivity |
-| [3. Building Repositories](docs/03-repositories.md) | Create Spring Data repositories with query derivation and custom SQL |
-| [4. REST API](docs/04-rest-api.md) | Expose your data through REST endpoints |
+| Module                                                        | What You'll Do                                                       |
+|---------------------------------------------------------------|----------------------------------------------------------------------|
+| [1. Cluster Setup](docs/01-cluster-setup.md)                  | Start a three-node Ignite cluster with Docker and load sample data   |
+| [2. Spring Boot Configuration](docs/02-spring-boot-config.md) | Add dependencies, configure connections, verify connectivity         |
+| [3. Building Repositories](docs/03-repositories.md)           | Create Spring Data repositories with query derivation and custom SQL |
+| [4. REST API](docs/04-rest-api.md)                            | Expose your data through REST endpoints                              |
 
 Each module takes roughly 20-30 minutes, depending on your familiarity with the technologies involved.
 
@@ -64,12 +64,12 @@ The template provides the foundation. You build on it during the training.
 
 ## Technology Stack
 
-| Component | Version |
-|-----------|---------|
-| Apache Ignite | 3.1.0 |
-| Spring Boot | 3.x |
-| Spring Data JDBC | 3.x |
-| Java | 17+ |
+| Component        | Version |
+|------------------|---------|
+| Apache Ignite    | 3.1.0   |
+| Spring Boot      | 3.x     |
+| Spring Data JDBC | 3.x     |
+| Java             | 17+     |
 
 For GridGain 9, update the Maven properties as described in the training modules.
 

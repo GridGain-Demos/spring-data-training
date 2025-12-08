@@ -18,12 +18,12 @@ The application queries a World Database containing countries and cities, demons
 
 The training is divided into four modules, each building on the previous:
 
-| Module | What You'll Do |
-|--------|----------------|
-| [1. Cluster Setup](01-cluster-setup.md) | Start a three-node Ignite cluster with Docker and load sample data |
-| [2. Spring Boot Configuration](02-spring-boot-config.md) | Configure dependencies, connections, and verify connectivity |
-| [3. Building Repositories](03-repositories.md) | Create Spring Data repositories with query derivation and custom SQL |
-| [4. REST API](04-rest-api.md) | Expose your data through REST endpoints |
+| Module                                                   | What You'll Do                                                       |
+|----------------------------------------------------------|----------------------------------------------------------------------|
+| [1. Cluster Setup](01-cluster-setup.md)                  | Start a three-node Ignite cluster with Docker and load sample data   |
+| [2. Spring Boot Configuration](02-spring-boot-config.md) | Configure dependencies, connections, and verify connectivity         |
+| [3. Building Repositories](03-repositories.md)           | Create Spring Data repositories with query derivation and custom SQL |
+| [4. REST API](04-rest-api.md)                            | Expose your data through REST endpoints                              |
 
 Each module takes roughly 20-30 minutes, depending on your familiarity with the technologies involved.
 

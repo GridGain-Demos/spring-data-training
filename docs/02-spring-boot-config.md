@@ -38,13 +38,13 @@ Open `pom.xml` and add the following dependencies inside the `<dependencies>` se
 
 Here's what each dependency provides:
 
-| Dependency | Purpose |
-|------------|---------|
-| `spring-boot-starter-web` | Embedded Tomcat server and Spring MVC for REST endpoints |
-| `spring-boot-starter-data-jdbc` | Spring Data JDBC framework for repository support |
-| `spring-boot-starter-test` | JUnit, assertion libraries, and Spring test utilities |
-| `spring-data-ignite` | Ignite SQL dialect so Spring Data generates compatible queries |
-| `spring-boot-starter-ignite-client` | Auto-configures an Ignite thin client from properties |
+| Dependency                          | Purpose                                                        |
+|-------------------------------------|----------------------------------------------------------------|
+| `spring-boot-starter-web`           | Embedded Tomcat server and Spring MVC for REST endpoints       |
+| `spring-boot-starter-data-jdbc`     | Spring Data JDBC framework for repository support              |
+| `spring-boot-starter-test`          | JUnit, assertion libraries, and Spring test utilities          |
+| `spring-data-ignite`                | Ignite SQL dialect so Spring Data generates compatible queries |
+| `spring-boot-starter-ignite-client` | Auto-configures an Ignite thin client from properties          |
 
 Note that we're using Spring Data **JDBC**, not Spring Data **JPA**. JPA (Hibernate) adds an ORM layer with caching, lazy loading, and entity state management. Spring Data JDBC is simpler: it maps objects to tables without the ORM complexity. For Ignite, this direct SQL approach is a better fit.
 
