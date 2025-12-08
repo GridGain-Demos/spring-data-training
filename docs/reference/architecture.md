@@ -200,6 +200,25 @@ When a client calls `GET /api/mostPopulated?limit=5`:
 6. Results flow back through the same path
 7. Spring serializes the `List<PopulousCity>` to JSON and returns it
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Repository
+    participant JDBC
+    participant Ignite as Ignite Cluster
+
+    Client->>Controller: GET /api/mostPopulated?limit=5
+    Controller->>Repository: findTopXMostPopulatedCities(5)
+    Repository->>JDBC: Generated SQL
+    JDBC->>Ignite: Query via thin client
+    Ignite->>Ignite: Parallel execution across nodes
+    Ignite-->>JDBC: Aggregated results
+    JDBC-->>Repository: ResultSet
+    Repository-->>Controller: List<PopulousCity>
+    Controller-->>Client: JSON response
+```
+
 The whole trip typically takes milliseconds because Ignite stores data in memory and executes queries in parallel.
 
 ## Scaling Considerations
