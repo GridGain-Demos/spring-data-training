@@ -24,7 +24,7 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 
 ### Note 1
 
-This project has been tested most thoroughly using Java 17 and Ignite 3. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
+This project has been tested most thoroughly using Java 17 and GridGain 9.1.8. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
 
 ### Note 2
 
@@ -42,30 +42,18 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
 
 ### 2. Start your Apache Ignite cluster
 
-1. Start your nodes using Docker Compose. Using Apache Ignite 3:
+1. Start your nodes using Docker Compose:
 
     ```bash
     docker compose -f docker-compose.yml up -d
     ```
 
-    Or GridGain 9:
-
-    ```bash
-    docker compose -f docker-compose-gg9.yml up -d
-    ```
-
 2. Initialize your cluster:
 
-   a. Start the Command Line Interface (CLI).  Using Apache Ignite 3:
+   a. Start the Command Line Interface (CLI):
 
     ```bash
-   docker run -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it apacheignite/ignite:3.1.0 cli
-   ```
-
-   Or GridGain 9:
-
-    ```bash
-   docker run -v ./gridgain-license.json:/opt/ignite/downloads/gridgain-license.json -v ./config/world.sql:/opt/ignite/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.8 cli
+   docker run -v ./gridgain-license.json:/opt/gridgain/downloads/gridgain-license.json -v ./config/world.sql:/opt/gridgain/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.8 cli
    ```
    (Ensure your license file is in your current directory.)
 
@@ -75,16 +63,10 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    connect http://node1:10300
    ```
 
-   c. Execute command to initialize the cluster. Using Apache Ignite 3:
+   c. Execute command to initialize the cluster:
 
    ```bash
-   cluster init --name=spring-data-training --metastorage-group=node1,node2
-   ```
-
-   Or GridGain 9:
-
-   ```bash
-   cluster init --name=spring-data-training --metastorage-group=node1,node2 --license=/opt/ignite/downloads/gridgain-license.json
+   cluster init --name=spring-data-training --metastorage-group=node1,node2 --license=/opt/gridgain/downloads/gridgain-license.json
    ```
 
 Leave the CLI connected to the cluster.
@@ -94,7 +76,7 @@ Leave the CLI connected to the cluster.
 1. In the same CLI window, load the media store database by executing the SQL command to load the sample data.
 
    ```bash
-   sql --file=/opt/ignite/downloads/world.sql
+   sql --file=/opt/gridgain/downloads/world.sql
     ```
 
 ## Hands-on part 2 
@@ -133,9 +115,7 @@ Leave the CLI connected to the cluster.
       </dependency>
       ```
 
-  2. If you're using GridGain rather than Apache Ignite, update the `ignite.project` property to `org.gridgain` and the `ignite.version` to the correct version of GridGain, `9.1.8` for example
-
-  3. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
+  2. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
 
       ```properties
      org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=org.apache.ignite.data.IgniteDialectProvider
@@ -296,16 +276,10 @@ In this section, we'll bring together the REST end-points supported by Spring Bo
 When you have finished the exercises, you can shut down your cluster.
 
 1. Shut down the client application in your IDE
-2. Shut down your cluster with the following command if you're using Apache Ignite:
+2. Shut down your cluster with the following command:
 
       ```shell
       docker compose -f docker-compose.yaml down
-      ```
-   
-   Or if you're using GridGain:
-
-      ```shell
-      docker compose -f docker-compose-gg9.yaml down
       ```
 
    The "down" command shuts down and deletes the containers. You can also use the "stop" command, which stops the cluster but keeps the containers, meaning that they can be restarted.
