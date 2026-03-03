@@ -24,11 +24,11 @@ All the sessions are delivered by seasoned Ignite experts and committers.
 
 ### Note 1
 
-This project has been tested most thoroughly using Java 17 and GridGain 9.1.8. (Apache Ignite 3 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
+This project has been tested most thoroughly using Java 17 and GridGain 9.1.8. (GridGain 9 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
 
 ### Note 2
 
-This project currently uses Spring Boot and Data 3.x. Ignite and GridGain are expected to support Spring 4.x soon.
+This project currently uses Spring Boot and Data 3.x. GridGain 9.1.19 and higher supports Spring 4.x.
 
 ## Hands-on part 1
 
@@ -40,12 +40,12 @@ Open a terminal window and clone the project to your dev environment:
 git clone https://github.com/GridGain-Demos/spring-data-training.git
 ```
 
-### 2. Start your Apache Ignite cluster
+### 2. Start your GridGain cluster
 
 1. Start your nodes using Docker Compose:
 
     ```bash
-    docker compose -f docker-compose.yml up -d
+    docker compose up -d
     ```
 
 2. Initialize your cluster:
@@ -66,7 +66,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    c. Execute command to initialize the cluster:
 
    ```bash
-   cluster init --name=spring-data-training --metastorage-group=node1,node2 --license=/opt/gridgain/downloads/gridgain-license.json
+   cluster init --name=spring-data-training --metastorage-group=node1,node2,node3 --license=/opt/gridgain/downloads/gridgain-license.json
    ```
 
 Leave the CLI connected to the cluster.
@@ -196,7 +196,7 @@ Leave the CLI connected to the cluster.
       mvn compile test
       ```
 
-### 7. Run Direct Queries With JOINs Via Ignite Repository
+### 7. Run Direct Queries With JOINs Via Spring Data JDBC Repository
 
   1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
 
@@ -248,7 +248,7 @@ Leave the CLI connected to the cluster.
 
 ### 8. Create Spring REST Controller
 
-In this section, we'll bring together the REST end-points supported by Spring Boot and the database access provided by Spring Data. By starting Ignite and loading the data (as mentioned in the above steps), this code can be directly used for the REST APIs. 
+In this section, we'll bring together the REST end-points supported by Spring Boot and the database access provided by Spring Data. By starting GridGain and loading the data (as mentioned in the above steps), this code can be directly used for the REST APIs. 
 
   1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
 
