@@ -1,45 +1,39 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+#  Copyright (C) GridGain Systems. All Rights Reserved.
+#  _________        _____ __________________        _____
+#  __  ____/___________(_)______  /__  ____/______ ____(_)_______
+#  _  / __  __  ___/__  / _  __  / _  / __  _  __ `/__  / __  __ \
+#  / /_/ /  _  /    _  /  / /_/ /  / /_/ /  / /_/ / _  /  _  / / /
+#  \____/   /_/     /_/   \_,__/   \____/   \__,_/  /_/   /_/ /_/
+
 
 name: spring-boot-data-training
 
-x-ignite-def:
-  &ignite-def
-  image: apacheignite/ignite:3.1.0
+x-gridgain-def:
+  &gridgain-def
+  image: gridgain/gridgain9:9.1.8
   environment:
     JVM_MAX_MEM: "4g"
     JVM_MIN_MEM: "4g"
   configs:
     - source: node_config
-      target: /opt/ignite/etc/ignite-config.conf
+      target: /opt/gridgain/etc/gridgain-config.conf
+      mode: 0644
 
 services:
   node1:
-    << : *ignite-def
+    << : *gridgain-def
     command: --node-name node1
     ports:
       - 10300:10300
       - 10800:10800
   node2:
-    << : *ignite-def
+    << : *gridgain-def
     command: --node-name node2
     ports:
       - 10301:10300
       - 10801:10800
 #  node3:
-#    << : *ignite-def
+#    << : *gridgain-def
 #    command: --node-name node3
 #    ports:
 #      - 10302:10300
