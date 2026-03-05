@@ -22,13 +22,9 @@ All the sessions are delivered by seasoned Ignite experts and committers.
   * [httpie](https://httpie.io)
   * A web browser
 
-### Note 1
+### Note
 
-This project has been tested most thoroughly using Java 17 and GridGain 9.1.8. (GridGain 9 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
-
-### Note 2
-
-This project currently uses Spring Boot and Data 3.x. GridGain 9.1.19 and higher supports Spring 4.x.
+This project has been tested most thoroughly using Java 17 and GridGain 9.1.19. (GridGain 9 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
 
 ## Hands-on part 1
 
@@ -53,7 +49,7 @@ git clone https://github.com/GridGain-Demos/spring-data-training.git
    a. Start the Command Line Interface (CLI):
 
     ```bash
-   docker run -v ./gridgain-license.json:/opt/gridgain/downloads/gridgain-license.json -v ./config/world.sql:/opt/gridgain/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.8 cli
+   docker run -v ./gridgain-license.json:/opt/gridgain/downloads/gridgain-license.json -v ./config/world.sql:/opt/gridgain/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.19 cli
    ```
    (Ensure your license file is in your current directory.)
 
@@ -181,7 +177,6 @@ Leave the CLI connected to the cluster.
       @Test
       void countryRepositoryWorks() {
         var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
-        System.out.println("count=" + results.size());
         Assertions.assertTrue(results.size() > 0);
       }
       ```
@@ -202,7 +197,7 @@ Leave the CLI connected to the cluster.
 
       ```java
       @Repository
-      public interface CityRepository extends CrudRepository<City, Integer> {
+      public interface CityRepository extends CrudRepository<City, CityKey> {
       }
       ```
 
@@ -223,9 +218,9 @@ Leave the CLI connected to the cluster.
       ```java
       @Test
 	  void cityRepositoryWorks() {
-          var city = cityRepository.findById(34);
+          var city = cityRepository.findById(new CityKey(34, "ALB"));
           Assertions.assertTrue(city.isPresent());
-          Assertions.assertEquals("Tirana", city.get().getName());
+          Assertions.assertEquals("Tirana", city.get().name());
    
           var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
           Assertions.assertEquals(5, populatedCities.size());
