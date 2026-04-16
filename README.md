@@ -279,7 +279,7 @@ When you have finished the exercises, you can shut down your cluster.
 2. Shut down your cluster with the following command:
 
       ```shell
-      docker compose -f docker-compose.yaml down
+      docker compose -f docker-compose.yml down
       ```
 
    The "down" command shuts down and deletes the containers. You can also use the "stop" command, which stops the cluster but keeps the containers, meaning that they can be restarted.
