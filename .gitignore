@@ -5,3 +5,7 @@
 /ignite/
 /libs/
 /bin/
+
+# IDE
+*.iml
+.idea/

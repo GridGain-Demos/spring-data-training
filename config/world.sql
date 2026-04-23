@@ -16,7 +16,7 @@ CREATE TABLE Country (
   HeadOfState VARCHAR,
   Capital INT,
   Code2 CHAR(2)
-) WITH "template=partitioned, backups=1, CACHE_NAME=Country";
+) WITH "template=partitioned, backups=1, CACHE_NAME=Country, VALUE_TYPE=com.gridgain.training.spring.model.Country";
 
 DROP TABLE IF EXISTS City;
 
@@ -27,7 +27,7 @@ CREATE TABLE City (
   District VARCHAR,
   Population INT,
   PRIMARY KEY (ID, CountryCode)
-) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City";
+) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City, VALUE_TYPE=com.gridgain.training.spring.model.City, KEY_TYPE=com.gridgain.training.spring.model.CityKey";
 
 CREATE INDEX idx_country_code ON city (CountryCode);
 
