@@ -1,80 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.4</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.gridgain.training</groupId>
-	<artifactId>spring-data-training</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>spring-data-training</name>
-	<description>Demo project for Spring Boot, Spring Data and Ignite Training</description>
-	<properties>
-		<java.version>1.8</java.version>
-		<h2.version>1.4.197</h2.version>
-		<ignite.version>2.16.0</ignite.version>
-	</properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<repositories>
-		<repository>
-			<id>GridGain External Repository</id>
-			<url>http://www.gridgainsystems.com/nexus/content/repositories/external</url>
-		</repository>
-	</repositories>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/>
+    </parent>
 
-	<dependencies>
+    <groupId>com.gridgain.training</groupId>
+    <artifactId>spring-data-training</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>spring-data-training</name>
+    <description>Apache Ignite with Spring Boot and Spring Data training — GG8 / thin client / Docker cluster (skeleton)</description>
 
-		<dependency>
-			<groupId>sqlline</groupId>
-			<artifactId>sqlline</artifactId>
-			<version>1.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ignite</groupId>
-			<artifactId>ignite-core</artifactId>
-			<version>${ignite.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ignite</groupId>
-			<artifactId>ignite-indexing</artifactId>
-			<version>${ignite.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-			<version>2.2.3.RELEASE</version>
-		</dependency>
-	</dependencies>
+    <properties>
+        <java.version>17</java.version>
+    </properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>com.gridgain.training.spring.Application</mainClass>
-				</configuration>
-			</plugin>
+    <repositories>
+        <repository>
+            <id>GridGain External Repository</id>
+            <url>https://www.gridgainsystems.com/nexus/content/repositories/external</url>
+        </repository>
+    </repositories>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<outputFile>${project.basedir}/libs/app.jar</outputFile>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <dependencies>
+        <!-- remaining deps added by the student during the training — see README step 3.1 -->
 
+        <dependency>
+            <groupId>org.gridgain</groupId>
+            <artifactId>ignite-core</artifactId>
+            <version>8.9.32</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>app</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.gridgain.training.spring.Application</mainClass>
+                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                </configuration>
+                <executions>
+                    <!--
+                      id="repackage" overrides the plugin's default execution
+                      (also id="repackage") rather than adding a second one.
+                    -->
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
