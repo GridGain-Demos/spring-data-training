@@ -1,4 +1,4 @@
-# Reference training cluster for GridGain Community (GG8).
+# Reference training cluster for GridGain Enterprise Edition (GG8).
 #
 # Per-node state:
 #   - Each node's work dir is bind-mounted at ./data/nodeN/ on the
@@ -25,7 +25,6 @@ services:
     volumes:
       - ./config/training-node-config.xml:/opt/config/training-node-config.xml:ro
       - ./config/ignite-log4j2.xml:/opt/gridgain/config/ignite-log4j2.xml:ro
-      - ./libs:/opt/gridgain/libs/user_libs:ro
       - ./gridgain-license.xml:/opt/gridgain/gridgain-license.xml
       - ./data/node1:/opt/gridgain/work
       - ./sql/world.sql:/tmp/world.sql
@@ -36,7 +35,6 @@ services:
     volumes:
       - ./config/training-node-config.xml:/opt/config/training-node-config.xml:ro
       - ./config/ignite-log4j2.xml:/opt/gridgain/config/ignite-log4j2.xml:ro
-      - ./libs:/opt/gridgain/libs/user_libs:ro
       - ./gridgain-license.xml:/opt/gridgain/gridgain-license.xml
       - ./data/node2:/opt/gridgain/work
 
@@ -46,7 +44,6 @@ services:
     volumes:
       - ./config/training-node-config.xml:/opt/config/training-node-config.xml:ro
       - ./config/ignite-log4j2.xml:/opt/gridgain/config/ignite-log4j2.xml:ro
-      - ./libs:/opt/gridgain/libs/user_libs:ro
       - ./gridgain-license.xml:/opt/gridgain/gridgain-license.xml
       - ./data/node3:/opt/gridgain/work
 

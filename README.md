@@ -25,6 +25,7 @@ During the live training you build a RESTful web service on top of a three-node 
 
 - Git
 - Docker Desktop
+- A bash-compatible terminal (Git Bash on Windows, or any macOS / Linux terminal)
 - Your favorite IDE (IntelliJ, Eclipse, VS Code, or a plain editor)
 - `curl` or Postman for exercising REST endpoints
 
@@ -78,6 +79,12 @@ Verify all three nodes joined:
 
 ```bash
 docker compose -f docker/docker-compose.yaml logs node1 | grep "Topology snapshot" | tail -1
+```
+
+**PowerShell:**
+
+```powershell
+docker compose -f docker/docker-compose.yaml logs node1 | Select-String "Topology snapshot" | Select-Object -Last 1
 ```
 
 Expect `servers=3` in the output.
@@ -182,10 +189,24 @@ These bindings make Ignite's binary metadata point at the Java model classes so 
 echo '!run /tmp/world.sql' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
 ```
 
+**PowerShell:**
+
+```powershell
+cmd /c "echo !run /tmp/world.sql | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u ""jdbc:ignite:thin://127.0.0.1/"" --silent=true"
+```
+
 Verify row counts:
 
 ```bash
 printf 'SELECT COUNT(*) FROM Country;\nSELECT COUNT(*) FROM City;\n!quit\n' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
+```
+
+**PowerShell:**
+
+```powershell
+"SELECT COUNT(*) FROM Country;", "SELECT COUNT(*) FROM City;", "!quit" | Out-File -Encoding ascii verify.sql
+cmd /c "docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u ""jdbc:ignite:thin://127.0.0.1/"" --silent=true < verify.sql"
+Remove-Item verify.sql
 ```
 
 Expect **239** countries and **4079** cities.
@@ -336,10 +357,22 @@ Wait approximately 15 seconds after starting for the `Started Application in …
 java @src/main/resources/j17.params -jar libs/app.jar --server.port=18080 &
 ```
 
+**PowerShell (standalone):**
+
+```powershell
+Start-Process java -ArgumentList '@src/main/resources/j17.params', '-jar', 'libs/app.jar', '--server.port=18080'
+```
+
 **Docker:**
 
 ```bash
 docker compose -f docker/docker-compose.yaml run --rm -p 18080:18080 --name sd-app app java @/work/src/main/resources/j17.params -jar /work/libs/app.jar --server.port=18080 &
+```
+
+**PowerShell (Docker):**
+
+```powershell
+Start-Process docker -ArgumentList 'compose', '-f', 'docker/docker-compose.yaml', 'run', '--rm', '-p', '18080:18080', '--name', 'sd-app', 'app', 'java', '@/work/src/main/resources/j17.params', '-jar', '/work/libs/app.jar', '--server.port=18080'
 ```
 
 `IGNITE_ADDRESS=node1:10800` is baked into the compose service so the `app` container reaches the cluster automatically.
@@ -348,6 +381,12 @@ docker compose -f docker/docker-compose.yaml run --rm -p 18080:18080 --name sd-a
 
 ```bash
 curl -s -w "HTTP %{http_code}\n" "http://localhost:18080/api/mostPopulated?limit=5"
+```
+
+**PowerShell:**
+
+```powershell
+curl.exe -s "http://localhost:18080/api/mostPopulated?limit=5"
 ```
 
 Expect `[["Mumbai (Bombay)",10500000,"India"],["Seoul",...],...]` with HTTP 200.
@@ -362,6 +401,12 @@ kill %1
 
 `%1` refers to the first job backgrounded in this shell session with `&`. Run this in the same terminal where you started the app.
 
+**PowerShell (standalone):**
+
+```powershell
+Stop-Process -Name java -Force
+```
+
 **Docker:**
 
 ```bash
@@ -372,11 +417,13 @@ docker rm -f sd-app
 
 ## Shutdown
 
+> **Note:** This training cluster uses in-memory storage only. All data loaded in step 4 is lost when the cluster stops. Re-run the SQL script after the next `up -d`.
+
 ```bash
 docker compose -f docker/docker-compose.yaml down
 ```
 
-The `docker/data/` directory is kept on the host (holds logs and marshaller metadata; only gains `db/` and `wal/` subdirectories when persistence is enabled).
+The `docker/data/` directory is kept on the host (holds logs and marshaller metadata). Because persistence is not enabled in this training, there are no `db/` or `wal/` subdirectories.
 
 ---
 
@@ -384,7 +431,7 @@ The `docker/data/` directory is kept on the host (holds logs and marshaller meta
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `docker compose up -d` hangs on the second attempt | Port 10800 still held by a cluster running in another directory | `docker compose -f docker/docker-compose.yaml down` in that directory first |
+| `docker compose -f docker/docker-compose.yaml up -d` hangs on the second attempt | Port 10800 still held by a cluster running in another directory | `docker compose -f docker/docker-compose.yaml down` in that directory first |
 | Nodes start but produce no logs; `docker/data/` empty (Linux only) | Container runs as UID 10000; host `docker/data/` owned by your user | `chown -R 10000:10000 docker/data/` |
 | `Web server failed to start. Port 8080 was already in use.` | Something on the host owns port 8080 | Pass `--server.port=18080` (already in the commands above) |
 | `InaccessibleObjectException: Unable to make field long java.nio.Buffer.address accessible` | Missing `@src/main/resources/j17.params` before `-jar` | Add the `@` argfile argument |
