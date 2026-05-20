@@ -190,13 +190,13 @@ These bindings make Ignite's binary metadata point at the Java model classes so 
 **Bash:**
 
 ```bash
-echo '!run /tmp/world.sql' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
+docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true -f /tmp/world.sql
 ```
 
 **PowerShell:**
 
 ```powershell
-cmd /c "echo !run /tmp/world.sql | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u ""jdbc:ignite:thin://127.0.0.1/"" --silent=true"
+cmd /c "docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u ""jdbc:ignite:thin://127.0.0.1/"" --silent=true -f /tmp/world.sql"
 ```
 
 Verify row counts:
