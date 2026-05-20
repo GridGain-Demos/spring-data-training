@@ -171,7 +171,7 @@ The `${IGNITE_ADDRESS:localhost:10800}` default lets the same jar run from the h
 
 ### 4.1 Bind the cache entries to Java types
 
-Edit `config/world.sql`. On the `CREATE TABLE Country` statement, add `VALUE_TYPE` inside the `WITH` clause:
+Edit `docker/sql/world.sql`. On the `CREATE TABLE Country` statement, add `VALUE_TYPE` inside the `WITH` clause:
 
 ```sql
 ) WITH "template=partitioned, backups=1, CACHE_NAME=Country, VALUE_TYPE=com.gridgain.training.spring.model.Country";
@@ -333,7 +333,7 @@ public class WorldDatabaseController {
 
 ### Build
 
-Two paths — pick whichever suits your environment.
+Two paths — pick whichever suits your environment. The sidecar path requires no local SDK; the standalone path gives you IDE debugging and faster iteration.
 
 **Standalone (host Maven):**
 
