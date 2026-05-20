@@ -127,7 +127,7 @@ Expect **239** countries and **4079** cities.
 
 ## 4. Build
 
-Two paths — pick whichever suits your environment.
+Two paths — pick whichever suits your environment. The sidecar path requires no local SDK; the standalone path gives you IDE debugging and faster iteration.
 
 ### Standalone (host Maven)
 
