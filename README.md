@@ -27,7 +27,7 @@ This is the **`gg8_docker_solution`** branch — the finished picture, with `Cou
 
 - Git
 - Docker Desktop
-- A bash-compatible terminal (Git Bash on Windows, or any macOS / Linux terminal)
+- A terminal — PowerShell on Windows, or any macOS / Linux terminal. Git Bash also works (see [Troubleshooting](#troubleshooting) for an MSYS path caveat)
 - Your favorite IDE (IntelliJ, Eclipse, VS Code, or a plain editor)
 - An HTTP client for verifying endpoints — `curl`, Postman, or a browser all work
 
