@@ -75,6 +75,8 @@ docker compose -f docker/docker-compose.yaml up -d
 
 Verify all three nodes joined:
 
+**Bash:**
+
 ```bash
 docker compose -f docker/docker-compose.yaml logs node1 | grep "Topology snapshot" | tail -1
 ```
@@ -91,6 +93,8 @@ Expect `servers=3` in the output.
 
 ## 3. Load the World Dataset
 
+**Bash:**
+
 ```bash
 docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true < config/world.sql
 ```
@@ -102,6 +106,8 @@ cmd /c "docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain
 ```
 
 Verify row counts:
+
+**Bash:**
 
 ```bash
 printf 'SELECT COUNT(*) FROM Country;\nSELECT COUNT(*) FROM City;\n!quit\n' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
@@ -176,6 +182,8 @@ Start-Process docker -ArgumentList 'compose', '-f', 'docker/docker-compose.yaml'
 ---
 
 ## 6. Verify the Endpoints
+
+**Bash:**
 
 ```bash
 curl -s -w "HTTP %{http_code}\n" "http://localhost:18080/api/mostPopulated?limit=5"
