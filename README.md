@@ -77,6 +77,8 @@ docker compose -f docker/docker-compose.yaml up -d
 
 Verify all three nodes joined:
 
+**Bash:**
+
 ```bash
 docker compose -f docker/docker-compose.yaml logs node1 | grep "Topology snapshot" | tail -1
 ```
@@ -185,6 +187,8 @@ These bindings make Ignite's binary metadata point at the Java model classes so 
 
 ### 4.2 Run the SQL script
 
+**Bash:**
+
 ```bash
 echo '!run /tmp/world.sql' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
 ```
@@ -196,6 +200,8 @@ cmd /c "echo !run /tmp/world.sql | docker compose -f docker/docker-compose.yaml 
 ```
 
 Verify row counts:
+
+**Bash:**
 
 ```bash
 printf 'SELECT COUNT(*) FROM Country;\nSELECT COUNT(*) FROM City;\n!quit\n' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
@@ -378,6 +384,8 @@ Start-Process docker -ArgumentList 'compose', '-f', 'docker/docker-compose.yaml'
 `IGNITE_ADDRESS=node1:10800` is baked into the compose service so the `app` container reaches the cluster automatically.
 
 ### Verify the endpoints
+
+**Bash:**
 
 ```bash
 curl -s -w "HTTP %{http_code}\n" "http://localhost:18080/api/mostPopulated?limit=5"
