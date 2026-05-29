@@ -1,285 +1,447 @@
-# Project Template for Apache Ignite With Spring Boot and Spring Data Training
+# Apache Ignite with Spring Boot and Spring Data — Training Project
 
-This project template is used throughout a
-[two-hour training session for Java developers and architects](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development)
-who want to explore the best practices and nuances of using [Spring Boot](https://spring.io/projects/spring-boot) and [Spring Data](https://spring.io/projects/spring-data) with [Apache Ignite](https://ignite.apache.org/) (or [GridGain](https://www.gridgain.com/tryfree)).
-During that instructor-led training, you build a RESTful web service that uses Apache Ignite as an in-memory database.
-The service is a Spring Boot application that interacts with the Ignite cluster via Spring Data repository abstractions.
+A free instructor-led training on building Spring Boot applications backed by a GridGain / Apache Ignite cluster using Spring Data repositories and the thin client. Check the [complete schedule](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development) and join an upcoming session.
 
-Check [the schedule a join one of our upcoming sessions](https://www.gridgain.com/products/services/training/apache-ignite-spring-boot-and-spring-data-development).
-All the sessions are delivered by seasoned Ignite experts and committers.
+During the live training you build a RESTful web service on top of a three-node GG8 cluster: Spring Data repositories for `Country` and `City`, a `@Query` SQL join for top-N most-populated cities, and a single REST endpoint that exercises the full stack. When you are done, diff your work against the finished solution on the [`gg8_docker_solution`](https://github.com/GridGain-Demos/spring-data-training/tree/gg8_docker_solution) branch.
 
-## Setting Up Environment
+## Table of Contents
 
-* GIT command line or [GitHub Desktop](https://desktop.github.com/)
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* Java Developer Kit, version 17 or later
-* Apache Maven 3.6.x
-* Your favorite IDE, such as IntelliJ IDEA, or Eclipse, or a simple text editor.
-* Tool to query a REST endpoint such as:
-  * [Postman REST tool](https://www.postman.com/)
-  * [curl](https://curl.se/)
-  * [httpie](https://httpie.io)
-  * A web browser
+- [Prerequisites](#prerequisites)
+- [Project Layout](#project-layout)
+- [1. Clone the Project](#1-clone-the-project)
+- [2. Start the Cluster](#2-start-the-cluster)
+- [3. Configure Spring Boot and the Thin Client](#3-configure-spring-boot-and-the-thin-client)
+- [4. Load the World Database](#4-load-the-world-database)
+- [5. Auto-Generated Repository Queries](#5-auto-generated-repository-queries)
+- [6. Direct Queries With SQL Joins](#6-direct-queries-with-sql-joins)
+- [7. REST Controller](#7-rest-controller)
+- [8. Build and Run](#8-build-and-run)
+- [Shutdown](#shutdown)
+- [Troubleshooting](#troubleshooting)
 
-### Note 1
+---
 
-This project has been tested most thoroughly using Java 17 and GridGain 9.1.8. (GridGain 9 supports Java 11, but the minimum version for Spring Boot is Java 17.) Later versions _may_ work; earlier versions will not. We test most frequently on Macs, but it should also work on Windows and Linux machines. Please create an Issue (or a PR!) if you find any issues.
+## Prerequisites
 
-### Note 2
+- Git
+- Docker Desktop
+- A terminal — PowerShell on Windows, or any macOS / Linux terminal. Git Bash also works (see [Troubleshooting](#troubleshooting) for an MSYS path caveat)
+- Your favorite IDE (IntelliJ, Eclipse, VS Code, or a plain editor)
+- An HTTP client for verifying endpoints — `curl`, Postman, or a browser all work
 
-This project currently uses Spring Boot and Data 3.x. GridGain 9.1.19 and higher supports Spring 4.x.
+JDK 17 and Maven are optional — the `app` sidecar provides both. Install JDK 17 locally only if you use the standalone paths.
 
-## Hands-on part 1
+**Linux only:** the GridGain container image runs as UID 10000. If nodes fail to start on Linux, run `chown -R 10000:10000 docker/data/` and retry.
 
-### 1. Clone the Project
+---
 
-Open a terminal window and clone the project to your dev environment:
+## Project Layout
 
-```bash
-git clone https://github.com/GridGain-Demos/spring-data-training.git
+Three GridGain nodes (`node1`, `node2`, `node3`) run on an isolated Docker bridge network. Only `node1` publishes port `10800` to the host — that is the thin-client address the app connects to. The `app` service is a Maven 3.9 + JDK 17 sidecar: it shares the project directory via a bind mount, so you can build and run the app without installing Maven locally. The build writes only to `libs/` — a directory the server nodes do not mount — so the cluster can stay up during sidecar builds.
+
+```
+config/
+  world.sql               ← schema and data loaded into the cluster
+docker/
+  docker-compose.yaml     ← full topology rationale and mount details live here
+  config/                 ← training-node-config.xml + ignite-log4j2.xml,
+  │                          bind-mounted read-only into every server node
+  data/
+  │  node1/log/           ← node1 log files on the host (also via `docker compose logs node1`)
+  │  node2/log/           ← node2 log files
+  │  node3/log/           ← node3 log files
+libs/                     ← app.jar lands here after a build
+src/                      ← training source — edit these for the exercises
 ```
 
-### 2. Start your GridGain cluster
+---
 
-1. Start your nodes using Docker Compose:
+## 1. Clone the Project
 
-    ```bash
-    docker compose up -d
-    ```
+```bash
+git clone -b gg8_docker https://github.com/GridGain-Demos/spring-data-training.git
+cd spring-data-training
+```
 
-2. Initialize your cluster:
+---
 
-   a. Start the Command Line Interface (CLI):
+## 2. Start the Cluster
 
-    ```bash
-   docker run -v ./gridgain-license.json:/opt/gridgain/downloads/gridgain-license.json -v ./config/world.sql:/opt/gridgain/downloads/world.sql --rm --network spring-boot-data-training_default -it gridgain/gridgain9:9.1.8 cli
-   ```
-   (Ensure your license file is in your current directory.)
+You should have received a license key a day or two before this session. Check your spam folder if you have not seen it yet. If you registered at the last minute, you can download a key from [our website](https://www.gridgain.com/tryfree).
 
-   b. Connect to the cluster.
+Copy your license key to the `docker` folder. Ensure it's called `gridgain-license.xml`.
 
-   ```bash
-   connect http://node1:10300
-   ```
+```bash
+docker compose -f docker/docker-compose.yaml up -d
+```
 
-   c. Execute command to initialize the cluster:
+Verify all three nodes joined:
 
-   ```bash
-   cluster init --name=spring-data-training --metastorage-group=node1,node2,node3 --license=/opt/gridgain/downloads/gridgain-license.json
-   ```
+**Bash:**
 
-Leave the CLI connected to the cluster.
+```bash
+docker compose -f docker/docker-compose.yaml logs node1 | grep "Topology snapshot" | tail -1
+```
 
-### 3. Load World Database
+**PowerShell:**
 
-1. In the same CLI window, load the media store database by executing the SQL command to load the sample data.
+```powershell
+docker compose -f docker/docker-compose.yaml logs node1 | Select-String "Topology snapshot" | Select-Object -Last 1
+```
 
-   ```bash
-   sql --file=/opt/gridgain/downloads/world.sql
-    ```
+Expect `servers=3` in the output.
 
-## Hands-on part 2 
+---
 
-### 4. Configure Ignite Spring Boot and Data Extensions
+## 3. Configure Spring Boot and the Thin Client
 
-  1. Enable Ignite Spring Boot and Spring Data extensions by adding the following artifacts to the `pom.xml` file
+### 3.1 Add dependencies to `pom.xml`
 
-      ```xml
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-      </dependency>
+Add these entries to the `<dependencies>` block. The extensions provide the `IgniteRepository` interface backed by an auto-configured thin client:
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jdbc</artifactId>
-      </dependency>
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-      </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
 
-      <dependency>
-         <groupId>${ignite.project}</groupId>
-         <artifactId>spring-data-ignite</artifactId>
-         <version>${ignite.version}</version>
-      </dependency>
+<dependency>
+    <groupId>org.apache.ignite</groupId>
+    <artifactId>ignite-spring-data-ext</artifactId>
+    <version>3.1.0</version>
+</dependency>
 
-      <dependency>
-         <groupId>${ignite.project}</groupId>
-         <artifactId>spring-boot-starter-ignite-client</artifactId>
-         <version>${ignite.version}</version>
-      </dependency>
-      ```
+<dependency>
+    <groupId>org.apache.ignite</groupId>
+    <artifactId>ignite-spring-boot-thin-client-autoconfigure-ext</artifactId>
+    <version>2.0.0</version>
+</dependency>
 
-  2. Configure Spring Data to speak the right SQL dialect. Create a file `resources/META-INF/spring.factories` and add the following parameter:
+<dependency>
+    <groupId>org.springframework.data</groupId>
+    <artifactId>spring-data-commons</artifactId>
+</dependency>
 
-      ```properties
-     org.springframework.data.jdbc.repository.config.DialectResolver$JdbcDialectProvider=org.apache.ignite.data.IgniteDialectProvider
-     ```
+<!--
+  Workaround: ignite-spring-data-ext:3.1.0 uses classes from
+  org.springframework.dao.* but does not declare spring-tx as a
+  transitive dep. Upstream bug; remove this entry once fixed.
+-->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-tx</artifactId>
+</dependency>
+```
 
-### 5. Configure Spring Boot to connect to Ignite
+The skeleton already declares `org.gridgain:ignite-core:8.9.32` — leave that alone.
 
-  1. Update the `application.properties` by adding an option that tells Spring Boot where to find the Ignite server node:
+### 3.2 Enable the Spring Data Ignite repositories
 
-      ```properties
-       ignite.client.addresses=127.0.0.1:10800
-       spring.datasource.url=jdbc:ignite:thin://localhost:10800/
-       spring.datasource.driver-class-name=org.apache.ignite.jdbc.IgniteJdbcDriver
-      ```
-     
-  2. Edit the `Application.java` class. Autowire our connection to the Ignite servers:
+Edit `src/main/java/com/gridgain/training/spring/Application.java` and add `@EnableIgniteRepositories`:
 
-      ```java
-      @Autowired
-      private Ignite ignite;
-      ```
+```java
+@SpringBootApplication
+@EnableIgniteRepositories
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
 
-  3. Add some diagnostics code to run when the server starts:
+### 3.3 Point Spring Boot at the cluster
 
-      ```java
-      private Logger log = LoggerFactory.getLogger(Application.class);
-
-      @EventListener(ApplicationReadyEvent.class)
-      public void startupLogger() {
-          log.info("Table names existing in cluster: {}", ignite.tables().tables().stream().map(Table::name).toList());
-
-          log.info("Node information:");
-          for (var n : ignite.cluster().nodes()) {
-              log.info("ID: {}, Name: {}, Address: {}", n.id(), n.name(), n.address());
-          }
-      }
-      ```
-
-  4. Run your new Spring Boot application. It should connect to your Ignite servers and list information about the tables and cluster topology
-
-## Hand-on part 3
-
-### 6. Run Simple Auto-Generated Queries Via Ignite Repository
-
-  1. Create the `CountryRepository` class (in the `com.gridgain.training.spring` package):
-
-      ```java
-      @Repository
-      public interface CountryRepository extends CrudRepository<Country, String> {
-
-      }
-      ```
-
-  2. Add a method that returns countries with a population bigger than provided one:
-
-      ```java
-      List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
-      ```
-
-  3. Add a test in ApplicationTests (in the `src/test` folder) that validates that the method returns a non-empty result:
+Edit `src/main/resources/application.properties`:
 
-      ```java
-      @Test
-      void countryRepositoryWorks() {
-        var results = countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000);
-        System.out.println("count=" + results.size());
-        Assertions.assertTrue(results.size() > 0);
-      }
-      ```
-      Add the following line after ApplicationTests class declaration:
-      ```java
-      @Autowired CountryRepository countryRepository;
-      ```
-     
-  4. Run the tests:
+```properties
+ignite-client.addresses=${IGNITE_ADDRESS:localhost:10800}
+```
 
-      ```shell
-      mvn compile test
-      ```
+The `${IGNITE_ADDRESS:localhost:10800}` default lets the same jar run from the host (`localhost:10800`) and from the docker `app` sidecar (`IGNITE_ADDRESS=node1:10800` is baked into the compose service). The thin-client bean is auto-configured by the autoconfigure extension — no `IgniteConfig` class needed.
 
-### 7. Run Direct Queries With JOINs Via Spring Data JDBC Repository
+---
 
-  1. Create the `CityRepository` class (in the `com.gridgain.training.spring` package) :
+## 4. Load the World Database
 
-      ```java
-      @Repository
-      public interface CityRepository extends CrudRepository<City, Integer> {
-      }
-      ```
+### 4.1 Bind the cache entries to Java types
 
-  2. Add a direct SQL query that joins two tables:
+Edit `docker/sql/world.sql`. On the `CREATE TABLE Country` statement, add `VALUE_TYPE` inside the `WITH` clause:
 
-      ```java
-      record PopulousCity(String cityName, Integer population, String countryName) {}
+```sql
+) WITH "template=partitioned, backups=1, CACHE_NAME=Country, VALUE_TYPE=com.gridgain.training.spring.model.Country";
+```
 
-      @Query("SELECT city.name as city_name, MAX(city.population) as population, country.name as country_name FROM country " +
-            "JOIN city ON city.countrycode = country.code " +
-            "GROUP BY city.name, country.name, city.population " +
-            "ORDER BY city.population DESC LIMIT :limit")
-      public List<PopulousCity> findTopXMostPopulatedCities(int limit);
-      ```
+On the `CREATE TABLE City` statement, add both `VALUE_TYPE` and `KEY_TYPE`:
 
-3. Create a test in ApplicationTests to validate the methods respond properly:
+```sql
+) WITH "template=partitioned, backups=1, affinityKey=CountryCode, CACHE_NAME=City, VALUE_TYPE=com.gridgain.training.spring.model.City, KEY_TYPE=com.gridgain.training.spring.model.CityKey";
+```
 
-      ```java
-      @Test
-	  void cityRepositoryWorks() {
-          var city = cityRepository.findById(34);
-          Assertions.assertTrue(city.isPresent());
-          Assertions.assertEquals("Tirana", city.get().getName());
-   
-          var populatedCities = cityRepository.findTopXMostPopulatedCities(5);
-          Assertions.assertEquals(5, populatedCities.size());
-          Assertions.assertEquals("Mumbai (Bombay)", populatedCities.get(0).cityName());
-	  }
-      ```
-   
-      Add the following line after ApplicationTests class declaration:
-      ```java
-      @Autowired CityRepository cityRepository;
-      ```
-   
-  4. Run the tests:
+These bindings make Ignite's binary metadata point at the Java model classes so the thin client can round-trip query results into `Country` and `City` objects.
 
-      ```shell
-      mvn compile test
-      ```
+### 4.2 Run the SQL script
 
-## Hands-on part 4
+**Bash:**
 
-### 8. Create Spring REST Controller
+```bash
+docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true -f /tmp/world.sql
+```
 
-In this section, we'll bring together the REST end-points supported by Spring Boot and the database access provided by Spring Data. By starting GridGain and loading the data (as mentioned in the above steps), this code can be directly used for the REST APIs. 
+**PowerShell:**
 
-  1. Create a REST Controller for the application by creating a new class named `WorldDatabaseController` (in the `com.gridgain.training.spring` package) with the following contents:
+```powershell
+cmd /c "docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u ""jdbc:ignite:thin://127.0.0.1/"" --silent=true -f /tmp/world.sql"
+```
 
-      ```java
-      @RestController
-      public class WorldDatabaseController {
-          @Autowired CityRepository cityRepository;
+Verify row counts:
 
-      }
-      ```
+**Bash:**
 
-  2. Add a method that returns top X most populated cities:
+```bash
+printf 'SELECT COUNT(*) FROM Country;\nSELECT COUNT(*) FROM City;\n!quit\n' | docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u "jdbc:ignite:thin://127.0.0.1/" --silent=true
+```
 
-      ```java
-      @GetMapping("/api/mostPopulated")
-      public List<CityRepository.PopulousCity> getMostPopulatedCities(@RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
-          return cityRepository.findTopXMostPopulatedCities(limit);
-      }
-      ```
+**PowerShell:**
 
-  3.  Restart the `Application` and then test the controller method either in REST endpoint viewer: http://localhost:8080/api/mostPopulated?limit=5
+```powershell
+"SELECT COUNT(*) FROM Country;", "SELECT COUNT(*) FROM City;", "!quit" | Out-File -Encoding ascii verify.sql
+cmd /c "docker compose -f docker/docker-compose.yaml exec -T node1 /opt/gridgain/bin/sqlline.sh -u ""jdbc:ignite:thin://127.0.0.1/"" --silent=true < verify.sql"
+Remove-Item verify.sql
+```
 
-## Hands-on wrap-up
+Expect **239** countries and **4079** cities.
 
-When you have finished the exercises, you can shut down your cluster.
+---
 
-1. Shut down the client application in your IDE
-2. Shut down your cluster with the following command:
+## 5. Auto-Generated Repository Queries
 
-      ```shell
-      docker compose -f docker-compose.yml down
-      ```
+Create `src/main/java/com/gridgain/training/spring/CountryRepository.java`:
 
-   The "down" command shuts down and deletes the containers. You can also use the "stop" command, which stops the cluster but keeps the containers, meaning that they can be restarted.
+```java
+package com.gridgain.training.spring;
+
+import java.util.List;
+
+import com.gridgain.training.spring.model.Country;
+import org.apache.ignite.springdata.repository.IgniteRepository;
+import org.apache.ignite.springdata.repository.config.RepositoryConfig;
+import org.springframework.stereotype.Repository;
+
+@RepositoryConfig(cacheName = "Country")
+@Repository
+public interface CountryRepository extends IgniteRepository<Country, String> {
+
+    List<Country> findByPopulationGreaterThanOrderByPopulationDesc(int population);
+}
+```
+
+Add a test in `src/test/java/com/gridgain/training/spring/ApplicationTests.java`:
+
+```java
+@Autowired CountryRepository countryRepository;
+
+@Test
+void countryRepositoryWorks() {
+    System.out.println("count=" +
+        countryRepository.findByPopulationGreaterThanOrderByPopulationDesc(100_000_000).size());
+}
+```
+
+---
+
+## 6. Direct Queries With SQL Joins
+
+Create `src/main/java/com/gridgain/training/spring/CityRepository.java`:
+
+```java
+package com.gridgain.training.spring;
+
+import java.util.List;
+import javax.cache.Cache;
+
+import com.gridgain.training.spring.model.City;
+import com.gridgain.training.spring.model.CityKey;
+import org.apache.ignite.springdata.repository.IgniteRepository;
+import org.apache.ignite.springdata.repository.config.Query;
+import org.apache.ignite.springdata.repository.config.RepositoryConfig;
+import org.springframework.stereotype.Repository;
+
+@RepositoryConfig(cacheName = "City")
+@Repository
+public interface CityRepository extends IgniteRepository<City, CityKey> {
+
+    Cache.Entry<CityKey, City> findById(int id);
+
+    @Query("SELECT city.name, MAX(city.population), country.name FROM country " +
+           "JOIN city ON city.countrycode = country.code " +
+           "GROUP BY city.name, country.name, city.population " +
+           "ORDER BY city.population DESC LIMIT ?")
+    List<List<?>> findTopXMostPopulatedCities(int limit);
+}
+```
+
+Extend the test:
+
+```java
+@Autowired CityRepository cityRepository;
+
+@Test
+void cityRepositoryWorks() {
+    System.out.println("city = " + cityRepository.findById(34));
+    System.out.println("top 5 = " + cityRepository.findTopXMostPopulatedCities(5));
+}
+```
+
+---
+
+## 7. REST Controller
+
+Create `src/main/java/com/gridgain/training/spring/WorldDatabaseController.java`:
+
+```java
+package com.gridgain.training.spring;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class WorldDatabaseController {
+
+    @Autowired
+    CityRepository cityRepository;
+
+    @GetMapping("/api/mostPopulated")
+    public List<List<?>> getMostPopulatedCities(@RequestParam("limit") int limit) {
+        return cityRepository.findTopXMostPopulatedCities(limit);
+    }
+}
+```
+
+---
+
+## 8. Build and Run
+
+### Build
+
+Two paths — pick whichever suits your environment. The sidecar path requires no local SDK; the standalone path gives you IDE debugging and faster iteration.
+
+**Standalone (host Maven):**
+
+The cluster can stay up during a host Maven build.
+
+```bash
+mvn clean package -DskipTests
+```
+
+**Docker:**
+
+The cluster can stay up — the build writes to `libs/`, which the server nodes do not mount.
+
+```bash
+docker compose -f docker/docker-compose.yaml run --rm app mvn -B clean package -DskipTests
+```
+
+Both paths produce `libs/app.jar`.
+
+### Run
+
+Wait approximately 15 seconds after starting for the `Started Application in …` log line.
+
+**Standalone:**
+
+```bash
+java @src/main/resources/j17.params -jar libs/app.jar --server.port=18080 &
+```
+
+**PowerShell (standalone):**
+
+```powershell
+Start-Process java -ArgumentList '@src/main/resources/j17.params', '-jar', 'libs/app.jar', '--server.port=18080'
+```
+
+**Docker:**
+
+```bash
+docker compose -f docker/docker-compose.yaml run --rm -p 18080:18080 --name sd-app app java @/work/src/main/resources/j17.params -jar /work/libs/app.jar --server.port=18080 &
+```
+
+**PowerShell (Docker):**
+
+```powershell
+Start-Process docker -ArgumentList 'compose', '-f', 'docker/docker-compose.yaml', 'run', '--rm', '-p', '18080:18080', '--name', 'sd-app', 'app', 'java', '@/work/src/main/resources/j17.params', '-jar', '/work/libs/app.jar', '--server.port=18080'
+```
+
+`IGNITE_ADDRESS=node1:10800` is baked into the compose service so the `app` container reaches the cluster automatically.
+
+### Verify the endpoints
+
+**Bash:**
+
+```bash
+curl -s -w "HTTP %{http_code}\n" "http://localhost:18080/api/mostPopulated?limit=5"
+```
+
+**PowerShell:**
+
+```powershell
+curl.exe -s "http://localhost:18080/api/mostPopulated?limit=5"
+```
+
+Expect `[["Mumbai (Bombay)",10500000,"India"],["Seoul",...],...]` with HTTP 200.
+
+### Stop the application
+
+**Standalone:**
+
+```bash
+kill %1
+```
+
+`%1` refers to the first job backgrounded in this shell session with `&`. Run this in the same terminal where you started the app.
+
+**PowerShell (standalone):**
+
+```powershell
+Stop-Process -Name java -Force
+```
+
+**Docker:**
+
+```bash
+docker rm -f sd-app
+```
+
+---
+
+## Shutdown
+
+> **Note:** This training cluster uses in-memory storage only. All data loaded in step 4 is lost when the cluster stops. Re-run the SQL script after the next `up -d`.
+
+```bash
+docker compose -f docker/docker-compose.yaml down
+```
+
+The `docker/data/` directory is kept on the host (holds logs and marshaller metadata). Because persistence is not enabled in this training, there are no `db/` or `wal/` subdirectories.
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `docker compose -f docker/docker-compose.yaml up -d` hangs on the second attempt | Port 10800 still held by a cluster running in another directory | `docker compose -f docker/docker-compose.yaml down` in that directory first |
+| Nodes start but produce no logs; `docker/data/` empty (Linux only) | Container runs as UID 10000; host `docker/data/` owned by your user | `chown -R 10000:10000 docker/data/` |
+| `Web server failed to start. Port 8080 was already in use.` | Something on the host owns port 8080 | Pass `--server.port=18080` (already in the commands above) |
+| `InaccessibleObjectException: Unable to make field long java.nio.Buffer.address accessible` | Missing `@src/main/resources/j17.params` before `-jar` | Add the `@` argfile argument |
+| Sidecar: `Connection refused` to thin client | `IGNITE_ADDRESS` env var not set | Check `environment:` block in `docker/docker-compose.yaml` sets `IGNITE_ADDRESS=node1:10800` |
+| `NoClassDefFoundError: InvalidDataAccessApiUsageException` | `ignite-spring-data-ext:3.1.0` omits `spring-tx` as a transitive dependency | Add `spring-tx` explicitly to `pom.xml` (see step 3.1) |

@@ -5,4 +5,7 @@
 /ignite/
 /libs/
 /bin/
-gridgain-license.json
+
+# IDE
+*.iml
+.idea/

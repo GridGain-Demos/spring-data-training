@@ -1,0 +1,10 @@
+# GridGain work directories (persistent data)
+data/
+data-dcr/
+
+# Log directories
+logs/
+logs-dcr/
+
+# GridGain license file
+gridgain-license.xml
