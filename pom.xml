@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.gridgain</groupId>
             <artifactId>ignite-core</artifactId>
-            <version>8.9.32</version>
+            <version>8.9.33</version>
         </dependency>
     </dependencies>
 
