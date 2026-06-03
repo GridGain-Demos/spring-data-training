@@ -34,10 +34,16 @@ This project currently uses Spring Boot and Data 3.x. GridGain 9.1.19 and higher
 
 ### 1. Clone the Project
 
-Open a terminal window and clone the project to your dev environment:
+1. Open a terminal window and clone the project to your dev environment:
 
 ```bash
 git clone https://github.com/GridGain-Demos/spring-data-training.git
+```
+
+2. Switch to the GridGain 9 branch:
+
+```bash
+git checkout gg9
 ```
 
 ### 2. Start your GridGain cluster
