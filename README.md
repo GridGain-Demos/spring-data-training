@@ -139,7 +139,7 @@ Add these entries to the `<dependencies>` block. The extensions provide the `Ign
 </dependency>
 ```
 
-The skeleton already declares `org.gridgain:ignite-core:8.9.33` — leave that alone.
+The skeleton already declares `org.gridgain:ignite-core:8.9.34` — leave that alone.
 
 ### 3.2 Enable the Spring Data Ignite repositories
 
